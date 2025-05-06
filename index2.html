@@ -1,0 +1,1429 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>DevPortfolio | Software Engineer</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/ScrollTrigger.min.js"></script>
+        <style>
+            @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+
+            :root {
+                --chocolate-dark: #1d1b1a;
+                --chocolate-medium: #3a2e26;
+                --chocolate-light: #5c4b3e;
+                --chocolate-accent: #d4a76a;
+                --chocolate-light-accent: #e8d5b5;
+            }
+
+            body {
+                font-family: "Poppins", sans-serif;
+                background-color: var(--chocolate-dark);
+                color: white;
+                scroll-behavior: smooth;
+            }
+
+            .bg-chocolate-dark {
+                background-color: var(--chocolate-dark);
+            }
+
+            .bg-chocolate-medium {
+                background-color: var(--chocolate-medium);
+            }
+
+            .bg-chocolate-light {
+                background-color: var(--chocolate-light);
+            }
+
+            .text-chocolate-accent {
+                color: var(--chocolate-accent);
+            }
+
+            .text-chocolate-light-accent {
+                color: var(--chocolate-light-accent);
+            }
+
+            .border-chocolate-accent {
+                border-color: var(--chocolate-accent);
+            }
+
+            .border-chocolate-light-accent {
+                border-color: var(--chocolate-light-accent);
+            }
+
+            .nav-link {
+                position: relative;
+            }
+
+            .nav-link::after {
+                content: "";
+                position: absolute;
+                width: 0;
+                height: 2px;
+                bottom: -2px;
+                left: 0;
+                background-color: var(--chocolate-accent);
+                transition: width 0.3s ease;
+            }
+
+            .nav-link:hover::after {
+                width: 100%;
+            }
+
+            .project-card {
+                transition: all 0.3s ease;
+                transform-style: preserve-3d;
+                background: linear-gradient(145deg, #2a2625, #1f1d1c);
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            }
+
+            .project-card:hover {
+                transform: translateY(-10px) scale(1.02);
+                box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+                background: linear-gradient(145deg, #3a2e26, #2a2625);
+            }
+
+            .skill-badge {
+                transition: all 0.3s ease;
+                background-color: rgba(212, 167, 106, 0.1);
+                border: 1px solid rgba(212, 167, 106, 0.3);
+            }
+
+            .skill-badge:hover {
+                transform: scale(1.1);
+                background-color: var(--chocolate-accent);
+                color: var(--chocolate-dark);
+            }
+
+            .floating {
+                animation: floating 6s ease-in-out infinite;
+            }
+
+            @keyframes floating {
+                0% {
+                    transform: translateY(0px);
+                }
+                50% {
+                    transform: translateY(-20px);
+                }
+                100% {
+                    transform: translateY(0px);
+                }
+            }
+
+            .pulse {
+                animation: pulse 2s infinite;
+            }
+
+            @keyframes pulse {
+                0% {
+                    box-shadow: 0 0 0 0 rgba(212, 167, 106, 0.7);
+                }
+                70% {
+                    box-shadow: 0 0 0 15px rgba(212, 167, 106, 0);
+                }
+                100% {
+                    box-shadow: 0 0 0 0 rgba(212, 167, 106, 0);
+                }
+            }
+
+            .typewriter {
+                overflow: hidden;
+                border-right: 3px solid var(--chocolate-accent);
+                white-space: nowrap;
+                animation:
+                    typing 3.5s steps(40, end),
+                    blink-caret 0.75s step-end infinite;
+            }
+
+            @keyframes typing {
+                from {
+                    width: 0;
+                }
+                to {
+                    width: 100%;
+                }
+            }
+
+            @keyframes blink-caret {
+                from,
+                to {
+                    border-color: transparent;
+                }
+                50% {
+                    border-color: var(--chocolate-accent);
+                }
+            }
+
+            .social-icon {
+                transition: all 0.3s ease;
+            }
+
+            .social-icon:hover {
+                transform: translateY(-5px) scale(1.2);
+                color: var(--chocolate-accent);
+            }
+
+            .section-title {
+                position: relative;
+                display: inline-block;
+            }
+
+            .section-title::after {
+                content: "";
+                position: absolute;
+                width: 100%;
+                height: 3px;
+                bottom: -5px;
+                left: 0;
+                background-color: var(--chocolate-accent);
+                transform: scaleX(0);
+                transform-origin: bottom right;
+                transition: transform 0.5s ease;
+            }
+
+            .animate-section-title::after {
+                transform: scaleX(1);
+                transform-origin: bottom left;
+            }
+
+            /* Custom scrollbar */
+            ::-webkit-scrollbar {
+                width: 8px;
+            }
+
+            ::-webkit-scrollbar-track {
+                background: var(--chocolate-dark);
+            }
+
+            ::-webkit-scrollbar-thumb {
+                background: var(--chocolate-accent);
+                border-radius: 4px;
+            }
+
+            ::-webkit-scrollbar-thumb:hover {
+                background: #c99b5a;
+            }
+
+            /* Form inputs */
+            .form-input {
+                background-color: rgba(29, 27, 26, 0.8);
+                border: 1px solid var(--chocolate-light);
+                color: var(--chocolate-light-accent);
+                transition: all 0.3s ease;
+            }
+
+            .form-input:focus {
+                border-color: var(--chocolate-accent);
+                box-shadow: 0 0 0 3px rgba(212, 167, 106, 0.2);
+                background-color: rgba(29, 27, 26, 0.9);
+            }
+
+            /* Gradient backgrounds */
+            .hero-gradient {
+                background: linear-gradient(135deg, #1d1b1a 0%, #3a2e26 100%);
+            }
+
+            .section-gradient {
+                background: linear-gradient(
+                    to bottom,
+                    #1d1b1a 0%,
+                    #2a2625 100%
+                );
+            }
+        </style>
+    </head>
+    <body class="bg-chocolate-dark">
+        <!-- Navigation -->
+        <nav
+            class="fixed w-full bg-chocolate-dark bg-opacity-90 z-50 shadow-lg border-b border-chocolate-light"
+        >
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-16">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <span
+                                class="text-xl font-bold text-chocolate-accent"
+                                >DevPortfolio</span
+                            >
+                        </div>
+                    </div>
+                    <div class="hidden md:block">
+                        <div class="ml-10 flex items-baseline space-x-4">
+                            <a
+                                href="#home"
+                                class="nav-link px-3 py-2 rounded-md text-sm font-medium text-chocolate-light-accent hover:text-chocolate-accent transition"
+                                >Home</a
+                            >
+                            <a
+                                href="#about"
+                                class="nav-link px-3 py-2 rounded-md text-sm font-medium text-chocolate-light-accent hover:text-chocolate-accent transition"
+                                >About</a
+                            >
+                            <a
+                                href="#projects"
+                                class="nav-link px-3 py-2 rounded-md text-sm font-medium text-chocolate-light-accent hover:text-chocolate-accent transition"
+                                >Projects</a
+                            >
+                            <a
+                                href="#contact"
+                                class="nav-link px-3 py-2 rounded-md text-sm font-medium text-chocolate-light-accent hover:text-chocolate-accent transition"
+                                >Contact</a
+                            >
+                        </div>
+                    </div>
+                    <div class="md:hidden">
+                        <button
+                            class="mobile-menu-button inline-flex items-center justify-center p-2 rounded-md text-chocolate-light-accent hover:text-chocolate-accent focus:outline-none"
+                        >
+                            <svg
+                                class="h-6 w-6"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M4 6h16M4 12h16M4 18h16"
+                                />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Hero Section -->
+        <section
+            id="home"
+            class="min-h-screen flex items-center justify-center pt-16 pb-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden hero-gradient"
+        >
+            <div class="absolute inset-0 opacity-20">
+                <div
+                    class="absolute inset-0 bg-gradient-to-b from-transparent to-chocolate-dark"
+                ></div>
+            </div>
+
+            <div class="max-w-7xl mx-auto text-center z-10">
+                <div class="mb-8">
+                    <div
+                        class="w-40 h-40 mx-auto rounded-full overflow-hidden border-4 border-chocolate-accent pulse"
+                    >
+                        <img
+                            src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80"
+                            alt="Profile"
+                            class="w-full h-full object-cover"
+                        />
+                    </div>
+                </div>
+
+                <h1
+                    class="text-4xl md:text-6xl font-bold mb-4 text-chocolate-light-accent"
+                >
+                    <span class="text-chocolate-accent">Hi,</span> I'm
+                    <span class="typewriter">Alex Developer</span>
+                </h1>
+
+                <h2
+                    class="text-2xl md:text-3xl font-semibold mb-6 text-chocolate-light-accent"
+                >
+                    Full Stack
+                    <span class="text-chocolate-accent">Software Engineer</span>
+                </h2>
+
+                <p
+                    class="text-lg md:text-xl max-w-3xl mx-auto mb-8 text-chocolate-light-accent"
+                >
+                    I build exceptional digital experiences with clean,
+                    efficient code and innovative solutions.
+                </p>
+
+                <div class="flex justify-center space-x-4">
+                    <a
+                        href="#projects"
+                        class="px-6 py-3 bg-chocolate-accent text-chocolate-dark font-medium rounded-lg hover:bg-opacity-90 transition transform hover:scale-105 shadow-lg shadow-chocolate-accent/20"
+                    >
+                        View My Work
+                    </a>
+                    <a
+                        href="#contact"
+                        class="px-6 py-3 border-2 border-chocolate-accent text-chocolate-light-accent font-medium rounded-lg hover:bg-chocolate-accent hover:text-chocolate-dark transition transform hover:scale-105"
+                    >
+                        Contact Me
+                    </a>
+                </div>
+            </div>
+
+            <div
+                class="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce"
+            >
+                <a href="#about" class="text-chocolate-accent">
+                    <i class="fas fa-chevron-down text-2xl"></i>
+                </a>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section id="about" class="py-20 px-4 sm:px-6 lg:px-8 section-gradient">
+            <div class="max-w-7xl mx-auto">
+                <h2
+                    class="text-3xl md:text-4xl font-bold mb-12 text-center section-title"
+                >
+                    <span class="text-chocolate-light-accent">About</span>
+                    <span class="text-chocolate-accent">Me</span>
+                </h2>
+
+                <div class="flex flex-col lg:flex-row items-center gap-12">
+                    <div class="lg:w-1/3 flex justify-center">
+                        <div
+                            class="w-64 h-64 md:w-80 md:h-80 rounded-full overflow-hidden border-4 border-chocolate-accent floating"
+                        >
+                            <img
+                                src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80"
+                                alt="About Me"
+                                class="w-full h-full object-cover"
+                            />
+                        </div>
+                    </div>
+
+                    <div class="lg:w-2/3">
+                        <h3
+                            class="text-2xl font-semibold mb-4 text-chocolate-accent"
+                        >
+                            Who am I?
+                        </h3>
+                        <p class="text-chocolate-light-accent mb-6">
+                            I'm a passionate Full Stack Software Engineer with
+                            over 5 years of experience in building web
+                            applications and digital solutions. My journey in
+                            tech started when I was 15, and since then I've been
+                            obsessed with creating elegant solutions to complex
+                            problems.
+                        </p>
+
+                        <div class="mb-8">
+                            <h4
+                                class="text-xl font-semibold mb-4 text-chocolate-light-accent"
+                            >
+                                My Skills
+                            </h4>
+                            <div class="flex flex-wrap gap-3">
+                                <span
+                                    class="skill-badge px-4 py-2 rounded-full text-chocolate-light-accent"
+                                    >JavaScript</span
+                                >
+                                <span
+                                    class="skill-badge px-4 py-2 rounded-full text-chocolate-light-accent"
+                                    >TypeScript</span
+                                >
+                                <span
+                                    class="skill-badge px-4 py-2 rounded-full text-chocolate-light-accent"
+                                    >React</span
+                                >
+                                <span
+                                    class="skill-badge px-4 py-2 rounded-full text-chocolate-light-accent"
+                                    >Node.js</span
+                                >
+                                <span
+                                    class="skill-badge px-4 py-2 rounded-full text-chocolate-light-accent"
+                                    >Python</span
+                                >
+                                <span
+                                    class="skill-badge px-4 py-2 rounded-full text-chocolate-light-accent"
+                                    >Django</span
+                                >
+                                <span
+                                    class="skill-badge px-4 py-2 rounded-full text-chocolate-light-accent"
+                                    >MongoDB</span
+                                >
+                                <span
+                                    class="skill-badge px-4 py-2 rounded-full text-chocolate-light-accent"
+                                    >PostgreSQL</span
+                                >
+                                <span
+                                    class="skill-badge px-4 py-2 rounded-full text-chocolate-light-accent"
+                                    >AWS</span
+                                >
+                                <span
+                                    class="skill-badge px-4 py-2 rounded-full text-chocolate-light-accent"
+                                    >Docker</span
+                                >
+                                <span
+                                    class="skill-badge px-4 py-2 rounded-full text-chocolate-light-accent"
+                                    >Kubernetes</span
+                                >
+                                <span
+                                    class="skill-badge px-4 py-2 rounded-full text-chocolate-light-accent"
+                                    >GraphQL</span
+                                >
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col sm:flex-row gap-6">
+                            <div class="flex-1">
+                                <h4
+                                    class="text-xl font-semibold mb-3 text-chocolate-light-accent"
+                                >
+                                    Education
+                                </h4>
+                                <div
+                                    class="pl-4 border-l-2 border-chocolate-accent"
+                                >
+                                    <div class="mb-4">
+                                        <h5
+                                            class="font-medium text-chocolate-accent"
+                                        >
+                                            MSc in Computer Science
+                                        </h5>
+                                        <p class="text-chocolate-light-accent">
+                                            Stanford University (2018-2020)
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <h5
+                                            class="font-medium text-chocolate-accent"
+                                        >
+                                            BSc in Software Engineering
+                                        </h5>
+                                        <p class="text-chocolate-light-accent">
+                                            MIT (2014-2018)
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex-1">
+                                <h4
+                                    class="text-xl font-semibold mb-3 text-chocolate-light-accent"
+                                >
+                                    Experience
+                                </h4>
+                                <div
+                                    class="pl-4 border-l-2 border-chocolate-accent"
+                                >
+                                    <div class="mb-4">
+                                        <h5
+                                            class="font-medium text-chocolate-accent"
+                                        >
+                                            Senior Software Engineer
+                                        </h5>
+                                        <p class="text-chocolate-light-accent">
+                                            Google (2021-Present)
+                                        </p>
+                                    </div>
+                                    <div class="mb-4">
+                                        <h5
+                                            class="font-medium text-chocolate-accent"
+                                        >
+                                            Software Engineer
+                                        </h5>
+                                        <p class="text-chocolate-light-accent">
+                                            Amazon (2018-2021)
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <h5
+                                            class="font-medium text-chocolate-accent"
+                                        >
+                                            Junior Developer
+                                        </h5>
+                                        <p class="text-chocolate-light-accent">
+                                            Microsoft (2016-2018)
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-8">
+                            <h4
+                                class="text-xl font-semibold mb-4 text-chocolate-light-accent"
+                            >
+                                Connect With Me
+                            </h4>
+                            <div class="flex space-x-6">
+                                <a
+                                    href="#"
+                                    class="social-icon text-2xl text-chocolate-light-accent hover:text-chocolate-accent"
+                                >
+                                    <i class="fab fa-github"></i>
+                                </a>
+                                <a
+                                    href="#"
+                                    class="social-icon text-2xl text-chocolate-light-accent hover:text-chocolate-accent"
+                                >
+                                    <i class="fab fa-linkedin"></i>
+                                </a>
+                                <a
+                                    href="#"
+                                    class="social-icon text-2xl text-chocolate-light-accent hover:text-chocolate-accent"
+                                >
+                                    <i class="fab fa-twitter"></i>
+                                </a>
+                                <a
+                                    href="#"
+                                    class="social-icon text-2xl text-chocolate-light-accent hover:text-chocolate-accent"
+                                >
+                                    <i class="fab fa-instagram"></i>
+                                </a>
+                                <a
+                                    href="#"
+                                    class="social-icon text-2xl text-chocolate-light-accent hover:text-chocolate-accent"
+                                >
+                                    <i class="fab fa-medium"></i>
+                                </a>
+                                <a
+                                    href="#"
+                                    class="social-icon text-2xl text-chocolate-light-accent hover:text-chocolate-accent"
+                                >
+                                    <i class="fab fa-dev"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Projects Section -->
+        <section
+            id="projects"
+            class="py-20 px-4 sm:px-6 lg:px-8 bg-chocolate-dark"
+        >
+            <div class="max-w-7xl mx-auto">
+                <h2
+                    class="text-3xl md:text-4xl font-bold mb-12 text-center section-title"
+                >
+                    <span class="text-chocolate-light-accent">My</span>
+                    <span class="text-chocolate-accent">Projects</span>
+                </h2>
+
+                <div class="mb-12 flex justify-center">
+                    <div class="inline-flex rounded-md shadow-sm" role="group">
+                        <button
+                            type="button"
+                            class="project-filter px-4 py-2 text-sm font-medium rounded-l-lg border border-chocolate-accent bg-chocolate-accent text-chocolate-dark"
+                            data-filter="all"
+                        >
+                            All
+                        </button>
+                        <button
+                            type="button"
+                            class="project-filter px-4 py-2 text-sm font-medium border-t border-b border-chocolate-accent text-chocolate-light-accent hover:bg-chocolate-medium"
+                            data-filter="contributions"
+                        >
+                            Contributions
+                        </button>
+                        <button
+                            type="button"
+                            class="project-filter px-4 py-2 text-sm font-medium border-t border-b border-chocolate-accent text-chocolate-light-accent hover:bg-chocolate-medium"
+                            data-filter="freelance"
+                        >
+                            Freelance
+                        </button>
+                        <button
+                            type="button"
+                            class="project-filter px-4 py-2 text-sm font-medium border-t border-b border-chocolate-accent text-chocolate-light-accent hover:bg-chocolate-medium"
+                            data-filter="personal"
+                        >
+                            Personal
+                        </button>
+                        <button
+                            type="button"
+                            class="project-filter px-4 py-2 text-sm font-medium rounded-r-lg border border-chocolate-accent text-chocolate-light-accent hover:bg-chocolate-medium"
+                            data-filter="affiliations"
+                        >
+                            Affiliations
+                        </button>
+                    </div>
+                </div>
+
+                <div
+                    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+                >
+                    <!-- Contribution Projects -->
+                    <div
+                        class="project-card contribution"
+                        data-category="contributions"
+                    >
+                        <div
+                            class="h-full rounded-lg overflow-hidden shadow-lg"
+                        >
+                            <div class="h-48 overflow-hidden">
+                                <img
+                                    src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
+                                    alt="Project"
+                                    class="w-full h-full object-cover transition duration-500 hover:scale-110"
+                                />
+                            </div>
+                            <div class="p-6">
+                                <div class="flex items-center mb-2">
+                                    <span
+                                        class="inline-block px-2 py-1 text-xs font-semibold rounded-full bg-chocolate-accent text-chocolate-dark mr-2"
+                                        >Contribution</span
+                                    >
+                                    <span
+                                        class="text-xs text-chocolate-light-accent"
+                                        >Open Source</span
+                                    >
+                                </div>
+                                <h3
+                                    class="text-xl font-bold mb-2 text-chocolate-light-accent"
+                                >
+                                    React Performance Toolkit
+                                </h3>
+                                <p class="text-chocolate-light-accent mb-4">
+                                    A set of tools and utilities to optimize
+                                    React applications, reducing bundle size by
+                                    40% and improving render performance.
+                                </p>
+                                <div class="flex flex-wrap gap-2 mb-4">
+                                    <span
+                                        class="text-xs px-2 py-1 rounded bg-chocolate-medium text-chocolate-light-accent"
+                                        >React</span
+                                    >
+                                    <span
+                                        class="text-xs px-2 py-1 rounded bg-chocolate-medium text-chocolate-light-accent"
+                                        >Webpack</span
+                                    >
+                                    <span
+                                        class="text-xs px-2 py-1 rounded bg-chocolate-medium text-chocolate-light-accent"
+                                        >Babel</span
+                                    >
+                                </div>
+                                <div class="flex space-x-3">
+                                    <a
+                                        href="#"
+                                        class="text-chocolate-accent hover:underline"
+                                        >View Project</a
+                                    >
+                                    <a
+                                        href="#"
+                                        class="text-chocolate-accent hover:underline"
+                                        >GitHub</a
+                                    >
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Freelance Projects -->
+                    <div
+                        class="project-card freelance"
+                        data-category="freelance"
+                    >
+                        <div
+                            class="h-full rounded-lg overflow-hidden shadow-lg"
+                        >
+                            <div class="h-48 overflow-hidden">
+                                <img
+                                    src="https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1469&q=80"
+                                    alt="Project"
+                                    class="w-full h-full object-cover transition duration-500 hover:scale-110"
+                                />
+                            </div>
+                            <div class="p-6">
+                                <div class="flex items-center mb-2">
+                                    <span
+                                        class="inline-block px-2 py-1 text-xs font-semibold rounded-full bg-blue-500 text-white mr-2"
+                                        >Freelance</span
+                                    >
+                                    <span
+                                        class="text-xs text-chocolate-light-accent"
+                                        >E-commerce</span
+                                    >
+                                </div>
+                                <h3
+                                    class="text-xl font-bold mb-2 text-chocolate-light-accent"
+                                >
+                                    Luxury Watch Store
+                                </h3>
+                                <p class="text-chocolate-light-accent mb-4">
+                                    A high-end e-commerce platform for luxury
+                                    watches with AR try-on feature, integrated
+                                    payment processing, and inventory
+                                    management.
+                                </p>
+                                <div class="flex flex-wrap gap-2 mb-4">
+                                    <span
+                                        class="text-xs px-2 py-1 rounded bg-chocolate-medium text-chocolate-light-accent"
+                                        >Next.js</span
+                                    >
+                                    <span
+                                        class="text-xs px-2 py-1 rounded bg-chocolate-medium text-chocolate-light-accent"
+                                        >Node.js</span
+                                    >
+                                    <span
+                                        class="text-xs px-2 py-1 rounded bg-chocolate-medium text-chocolate-light-accent"
+                                        >Stripe</span
+                                    >
+                                    <span
+                                        class="text-xs px-2 py-1 rounded bg-chocolate-medium text-chocolate-light-accent"
+                                        >AR.js</span
+                                    >
+                                </div>
+                                <div class="flex space-x-3">
+                                    <a
+                                        href="#"
+                                        class="text-chocolate-accent hover:underline"
+                                        >View Project</a
+                                    >
+                                    <a
+                                        href="#"
+                                        class="text-chocolate-accent hover:underline"
+                                        >Case Study</a
+                                    >
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Personal Projects -->
+                    <div class="project-card personal" data-category="personal">
+                        <div
+                            class="h-full rounded-lg overflow-hidden shadow-lg"
+                        >
+                            <div class="h-48 overflow-hidden">
+                                <img
+                                    src="https://images.unsplash.com/photo-1555774698-0f77e70ac3f0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
+                                    alt="Project"
+                                    class="w-full h-full object-cover transition duration-500 hover:scale-110"
+                                />
+                            </div>
+                            <div class="p-6">
+                                <div class="flex items-center mb-2">
+                                    <span
+                                        class="inline-block px-2 py-1 text-xs font-semibold rounded-full bg-purple-500 text-white mr-2"
+                                        >Personal</span
+                                    >
+                                    <span
+                                        class="text-xs text-chocolate-light-accent"
+                                        >Productivity</span
+                                    >
+                                </div>
+                                <h3
+                                    class="text-xl font-bold mb-2 text-chocolate-light-accent"
+                                >
+                                    FocusFlow
+                                </h3>
+                                <p class="text-chocolate-light-accent mb-4">
+                                    A Pomodoro timer app with task management,
+                                    analytics, and distraction blocking features
+                                    to boost productivity.
+                                </p>
+                                <div class="flex flex-wrap gap-2 mb-4">
+                                    <span
+                                        class="text-xs px-2 py-1 rounded bg-chocolate-medium text-chocolate-light-accent"
+                                        >Electron</span
+                                    >
+                                    <span
+                                        class="text-xs px-2 py-1 rounded bg-chocolate-medium text-chocolate-light-accent"
+                                        >React</span
+                                    >
+                                    <span
+                                        class="text-xs px-2 py-1 rounded bg-chocolate-medium text-chocolate-light-accent"
+                                        >IndexedDB</span
+                                    >
+                                    <span
+                                        class="text-xs px-2 py-1 rounded bg-chocolate-medium text-chocolate-light-accent"
+                                        >D3.js</span
+                                    >
+                                </div>
+                                <div class="flex space-x-3">
+                                    <a
+                                        href="#"
+                                        class="text-chocolate-accent hover:underline"
+                                        >View Project</a
+                                    >
+                                    <a
+                                        href="#"
+                                        class="text-chocolate-accent hover:underline"
+                                        >GitHub</a
+                                    >
+                                    <a
+                                        href="#"
+                                        class="text-chocolate-accent hover:underline"
+                                        >Download</a
+                                    >
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Affiliation Projects -->
+                    <div
+                        class="project-card affiliation"
+                        data-category="affiliations"
+                    >
+                        <div
+                            class="h-full rounded-lg overflow-hidden shadow-lg"
+                        >
+                            <div class="h-48 overflow-hidden">
+                                <img
+                                    src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
+                                    alt="Project"
+                                    class="w-full h-full object-cover transition duration-500 hover:scale-110"
+                                />
+                            </div>
+                            <div class="p-6">
+                                <div class="flex items-center mb-2">
+                                    <span
+                                        class="inline-block px-2 py-1 text-xs font-semibold rounded-full bg-green-500 text-white mr-2"
+                                        >Affiliation</span
+                                    >
+                                    <span
+                                        class="text-xs text-chocolate-light-accent"
+                                        >Google</span
+                                    >
+                                </div>
+                                <h3
+                                    class="text-xl font-bold mb-2 text-chocolate-light-accent"
+                                >
+                                    Cloud Migration Toolkit
+                                </h3>
+                                <p class="text-chocolate-light-accent mb-4">
+                                    Developed as part of Google Cloud's partner
+                                    program, this toolkit helps enterprises
+                                    migrate legacy systems to cloud
+                                    infrastructure.
+                                </p>
+                                <div class="flex flex-wrap gap-2 mb-4">
+                                    <span
+                                        class="text-xs px-2 py-1 rounded bg-chocolate-medium text-chocolate-light-accent"
+                                        >GCP</span
+                                    >
+                                    <span
+                                        class="text-xs px-2 py-1 rounded bg-chocolate-medium text-chocolate-light-accent"
+                                        >Terraform</span
+                                    >
+                                    <span
+                                        class="text-xs px-2 py-1 rounded bg-chocolate-medium text-chocolate-light-accent"
+                                        >Python</span
+                                    >
+                                    <span
+                                        class="text-xs px-2 py-1 rounded bg-chocolate-medium text-chocolate-light-accent"
+                                        >Kubernetes</span
+                                    >
+                                </div>
+                                <div class="flex space-x-3">
+                                    <a
+                                        href="#"
+                                        class="text-chocolate-accent hover:underline"
+                                        >View Project</a
+                                    >
+                                    <a
+                                        href="#"
+                                        class="text-chocolate-accent hover:underline"
+                                        >Documentation</a
+                                    >
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- More Projects -->
+                    <div
+                        class="project-card contribution"
+                        data-category="contributions"
+                    >
+                        <div
+                            class="h-full rounded-lg overflow-hidden shadow-lg"
+                        >
+                            <div class="h-48 overflow-hidden">
+                                <img
+                                    src="https://images.unsplash.com/photo-1620712943543-bcc4688e7485?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=765&q=80"
+                                    alt="Project"
+                                    class="w-full h-full object-cover transition duration-500 hover:scale-110"
+                                />
+                            </div>
+                            <div class="p-6">
+                                <div class="flex items-center mb-2">
+                                    <span
+                                        class="inline-block px-2 py-1 text-xs font-semibold rounded-full bg-chocolate-accent text-chocolate-dark mr-2"
+                                        >Contribution</span
+                                    >
+                                    <span
+                                        class="text-xs text-chocolate-light-accent"
+                                        >Mozilla</span
+                                    >
+                                </div>
+                                <h3
+                                    class="text-xl font-bold mb-2 text-chocolate-light-accent"
+                                >
+                                    Firefox DevTools Extension
+                                </h3>
+                                <p class="text-chocolate-light-accent mb-4">
+                                    Contributed to the Firefox DevTools
+                                    extension API, enabling better debugging
+                                    capabilities for web developers.
+                                </p>
+                                <div class="flex flex-wrap gap-2 mb-4">
+                                    <span
+                                        class="text-xs px-2 py-1 rounded bg-chocolate-medium text-chocolate-light-accent"
+                                        >JavaScript</span
+                                    >
+                                    <span
+                                        class="text-xs px-2 py-1 rounded bg-chocolate-medium text-chocolate-light-accent"
+                                        >WebExtensions</span
+                                    >
+                                    <span
+                                        class="text-xs px-2 py-1 rounded bg-chocolate-medium text-chocolate-light-accent"
+                                        >Firefox</span
+                                    >
+                                </div>
+                                <div class="flex space-x-3">
+                                    <a
+                                        href="#"
+                                        class="text-chocolate-accent hover:underline"
+                                        >View Project</a
+                                    >
+                                    <a
+                                        href="#"
+                                        class="text-chocolate-accent hover:underline"
+                                        >GitHub</a
+                                    >
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div
+                        class="project-card freelance"
+                        data-category="freelance"
+                    >
+                        <div
+                            class="h-full rounded-lg overflow-hidden shadow-lg"
+                        >
+                            <div class="h-48 overflow-hidden">
+                                <img
+                                    src="https://images.unsplash.com/photo-1521791055366-0d553872125f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1469&q=80"
+                                    alt="Project"
+                                    class="w-full h-full object-cover transition duration-500 hover:scale-110"
+                                />
+                            </div>
+                            <div class="p-6">
+                                <div class="flex items-center mb-2">
+                                    <span
+                                        class="inline-block px-2 py-1 text-xs font-semibold rounded-full bg-blue-500 text-white mr-2"
+                                        >Freelance</span
+                                    >
+                                    <span
+                                        class="text-xs text-chocolate-light-accent"
+                                        >Healthcare</span
+                                    >
+                                </div>
+                                <h3
+                                    class="text-xl font-bold mb-2 text-chocolate-light-accent"
+                                >
+                                    Telemedicine Platform
+                                </h3>
+                                <p class="text-chocolate-light-accent mb-4">
+                                    A HIPAA-compliant telemedicine solution with
+                                    video consultations, prescription
+                                    management, and patient records.
+                                </p>
+                                <div class="flex flex-wrap gap-2 mb-4">
+                                    <span
+                                        class="text-xs px-2 py-1 rounded bg-chocolate-medium text-chocolate-light-accent"
+                                        >React Native</span
+                                    >
+                                    <span
+                                        class="text-xs px-2 py-1 rounded bg-chocolate-medium text-chocolate-light-accent"
+                                        >Node.js</span
+                                    >
+                                    <span
+                                        class="text-xs px-2 py-1 rounded bg-chocolate-medium text-chocolate-light-accent"
+                                        >WebRTC</span
+                                    >
+                                    <span
+                                        class="text-xs px-2 py-1 rounded bg-chocolate-medium text-chocolate-light-accent"
+                                        >MongoDB</span
+                                    >
+                                </div>
+                                <div class="flex space-x-3">
+                                    <a
+                                        href="#"
+                                        class="text-chocolate-accent hover:underline"
+                                        >Case Study</a
+                                    >
+                                    <a
+                                        href="#"
+                                        class="text-chocolate-accent hover:underline"
+                                        >Testimonials</a
+                                    >
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center mt-12">
+                    <a
+                        href="#"
+                        class="px-6 py-3 border-2 border-chocolate-accent text-chocolate-light-accent font-medium rounded-lg hover:bg-chocolate-accent hover:text-chocolate-dark transition transform hover:scale-105 inline-flex items-center"
+                    >
+                        View All Projects
+                        <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section
+            id="contact"
+            class="py-20 px-4 sm:px-6 lg:px-8 section-gradient"
+        >
+            <div class="max-w-7xl mx-auto">
+                <h2
+                    class="text-3xl md:text-4xl font-bold mb-12 text-center section-title"
+                >
+                    <span class="text-chocolate-light-accent">Get In</span>
+                    <span class="text-chocolate-accent">Touch</span>
+                </h2>
+
+                <div class="flex flex-col lg:flex-row gap-12">
+                    <div class="lg:w-1/2">
+                        <h3
+                            class="text-2xl font-semibold mb-6 text-chocolate-accent"
+                        >
+                            Contact Information
+                        </h3>
+
+                        <div class="space-y-6">
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0 pt-1">
+                                    <i
+                                        class="fas fa-envelope text-chocolate-accent text-xl"
+                                    ></i>
+                                </div>
+                                <div class="ml-4">
+                                    <h4
+                                        class="text-lg font-medium text-chocolate-light-accent"
+                                    >
+                                        Email
+                                    </h4>
+                                    <p class="text-chocolate-light-accent">
+                                        alex.developer@example.com
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0 pt-1">
+                                    <i
+                                        class="fas fa-phone-alt text-chocolate-accent text-xl"
+                                    ></i>
+                                </div>
+                                <div class="ml-4">
+                                    <h4
+                                        class="text-lg font-medium text-chocolate-light-accent"
+                                    >
+                                        Phone
+                                    </h4>
+                                    <p class="text-chocolate-light-accent">
+                                        +1 (555) 123-4567
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0 pt-1">
+                                    <i
+                                        class="fas fa-map-marker-alt text-chocolate-accent text-xl"
+                                    ></i>
+                                </div>
+                                <div class="ml-4">
+                                    <h4
+                                        class="text-lg font-medium text-chocolate-light-accent"
+                                    >
+                                        Location
+                                    </h4>
+                                    <p class="text-chocolate-light-accent">
+                                        San Francisco, California
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-10">
+                            <h4
+                                class="text-xl font-semibold mb-4 text-chocolate-light-accent"
+                            >
+                                Follow Me
+                            </h4>
+                            <div class="flex space-x-6">
+                                <a
+                                    href="#"
+                                    class="social-icon text-2xl text-chocolate-light-accent hover:text-chocolate-accent"
+                                >
+                                    <i class="fab fa-github"></i>
+                                </a>
+                                <a
+                                    href="#"
+                                    class="social-icon text-2xl text-chocolate-light-accent hover:text-chocolate-accent"
+                                >
+                                    <i class="fab fa-linkedin"></i>
+                                </a>
+                                <a
+                                    href="#"
+                                    class="social-icon text-2xl text-chocolate-light-accent hover:text-chocolate-accent"
+                                >
+                                    <i class="fab fa-twitter"></i>
+                                </a>
+                                <a
+                                    href="#"
+                                    class="social-icon text-2xl text-chocolate-light-accent hover:text-chocolate-accent"
+                                >
+                                    <i class="fab fa-instagram"></i>
+                                </a>
+                                <a
+                                    href="#"
+                                    class="social-icon text-2xl text-chocolate-light-accent hover:text-chocolate-accent"
+                                >
+                                    <i class="fab fa-medium"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="lg:w-1/2">
+                        <form class="space-y-6">
+                            <div>
+                                <label
+                                    for="name"
+                                    class="block text-sm font-medium text-chocolate-light-accent mb-1"
+                                    >Your Name</label
+                                >
+                                <input
+                                    type="text"
+                                    id="name"
+                                    class="w-full px-4 py-3 form-input rounded-lg focus:ring-2 focus:ring-chocolate-accent focus:border-transparent placeholder-chocolate-light"
+                                    placeholder="John Doe"
+                                />
+                            </div>
+
+                            <div>
+                                <label
+                                    for="email"
+                                    class="block text-sm font-medium text-chocolate-light-accent mb-1"
+                                    >Email Address</label
+                                >
+                                <input
+                                    type="email"
+                                    id="email"
+                                    class="w-full px-4 py-3 form-input rounded-lg focus:ring-2 focus:ring-chocolate-accent focus:border-transparent placeholder-chocolate-light"
+                                    placeholder="john@example.com"
+                                />
+                            </div>
+
+                            <div>
+                                <label
+                                    for="subject"
+                                    class="block text-sm font-medium text-chocolate-light-accent mb-1"
+                                    >Subject</label
+                                >
+                                <input
+                                    type="text"
+                                    id="subject"
+                                    class="w-full px-4 py-3 form-input rounded-lg focus:ring-2 focus:ring-chocolate-accent focus:border-transparent placeholder-chocolate-light"
+                                    placeholder="Project Inquiry"
+                                />
+                            </div>
+
+                            <div>
+                                <label
+                                    for="message"
+                                    class="block text-sm font-medium text-chocolate-light-accent mb-1"
+                                    >Your Message</label
+                                >
+                                <textarea
+                                    id="message"
+                                    rows="5"
+                                    class="w-full px-4 py-3 form-input rounded-lg focus:ring-2 focus:ring-chocolate-accent focus:border-transparent placeholder-chocolate-light"
+                                    placeholder="Hello, I'd like to talk about..."
+                                ></textarea>
+                            </div>
+
+                            <div>
+                                <button
+                                    type="submit"
+                                    class="w-full px-6 py-3 bg-chocolate-accent text-chocolate-dark font-medium rounded-lg hover:bg-opacity-90 transition transform hover:scale-105 shadow-lg shadow-chocolate-accent/20"
+                                >
+                                    Send Message
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer
+            class="py-8 px-4 sm:px-6 lg:px-8 bg-chocolate-dark border-t border-chocolate-light"
+        >
+            <div class="max-w-7xl mx-auto">
+                <div
+                    class="flex flex-col md:flex-row justify-between items-center"
+                >
+                    <div class="mb-4 md:mb-0">
+                        <span class="text-xl font-bold text-chocolate-accent"
+                            >DevPortfolio</span
+                        >
+                        <p class="text-chocolate-light-accent mt-1">
+                            © 2023 Alex Developer. All rights reserved.
+                        </p>
+                    </div>
+
+                    <div class="flex space-x-6">
+                        <a
+                            href="#"
+                            class="text-chocolate-light-accent hover:text-chocolate-accent transition"
+                        >
+                            <i class="fab fa-github text-xl"></i>
+                        </a>
+                        <a
+                            href="#"
+                            class="text-chocolate-light-accent hover:text-chocolate-accent transition"
+                        >
+                            <i class="fab fa-linkedin text-xl"></i>
+                        </a>
+                        <a
+                            href="#"
+                            class="text-chocolate-light-accent hover:text-chocolate-accent transition"
+                        >
+                            <i class="fab fa-twitter text-xl"></i>
+                        </a>
+                        <a
+                            href="#"
+                            class="text-chocolate-light-accent hover:text-chocolate-accent transition"
+                        >
+                            <i class="fab fa-instagram text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+
+        <script>
+            // GSAP Animations
+            document.addEventListener("DOMContentLoaded", () => {
+                // Register ScrollTrigger plugin
+                gsap.registerPlugin(ScrollTrigger);
+
+                // Animate sections on scroll
+                gsap.utils.toArray("section").forEach((section) => {
+                    gsap.from(section, {
+                        scrollTrigger: {
+                            trigger: section,
+                            start: "top 80%",
+                            toggleActions: "play none none none",
+                        },
+                        opacity: 0,
+                        y: 50,
+                        duration: 1,
+                    });
+                });
+
+                // Animate section titles
+                gsap.utils.toArray(".section-title").forEach((title) => {
+                    ScrollTrigger.create({
+                        trigger: title,
+                        start: "top 80%",
+                        onEnter: () =>
+                            title.classList.add("animate-section-title"),
+                    });
+                });
+
+                // Project filtering
+                const filterButtons =
+                    document.querySelectorAll(".project-filter");
+                const projectCards = document.querySelectorAll(".project-card");
+
+                filterButtons.forEach((button) => {
+                    button.addEventListener("click", () => {
+                        // Update active button
+                        filterButtons.forEach((btn) => {
+                            btn.classList.remove(
+                                "bg-chocolate-accent",
+                                "text-chocolate-dark",
+                            );
+                            btn.classList.add(
+                                "text-chocolate-light-accent",
+                                "hover:bg-chocolate-medium",
+                            );
+                        });
+
+                        button.classList.add(
+                            "bg-chocolate-accent",
+                            "text-chocolate-dark",
+                        );
+                        button.classList.remove(
+                            "text-chocolate-light-accent",
+                            "hover:bg-chocolate-medium",
+                        );
+
+                        // Filter projects
+                        const filter = button.dataset.filter;
+
+                        projectCards.forEach((card) => {
+                            if (
+                                filter === "all" ||
+                                card.dataset.category === filter
+                            ) {
+                                card.style.display = "block";
+                                gsap.from(card, {
+                                    opacity: 0,
+                                    y: 20,
+                                    duration: 0.5,
+                                });
+                            } else {
+                                card.style.display = "none";
+                            }
+                        });
+                    });
+                });
+
+                // Mobile menu toggle
+                const mobileMenuButton = document.querySelector(
+                    ".mobile-menu-button",
+                );
+                const navLinks = document.querySelector(
+                    ".md\\:hidden + .md\\:hidden",
+                );
+
+                mobileMenuButton.addEventListener("click", () => {
+                    // Implement mobile menu toggle functionality here
+                    console.log("Mobile menu clicked");
+                });
+
+                // Smooth scrolling for navigation links
+                document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+                    anchor.addEventListener("click", function (e) {
+                        e.preventDefault();
+
+                        const targetId = this.getAttribute("href");
+                        const targetElement = document.querySelector(targetId);
+
+                        if (targetElement) {
+                            window.scrollTo({
+                                top: targetElement.offsetTop - 80,
+                                behavior: "smooth",
+                            });
+                        }
+                    });
+                });
+            });
+        </script>
+    </body>
+</html>
