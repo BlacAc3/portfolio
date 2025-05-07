@@ -27,105 +27,87 @@ const ProjectsSection = () => {
   const projects = [
     {
       id: 1,
-      title: "React Performance Toolkit",
+      title: "Multi-Tenant Subscription Management API (SaaS)",
       description:
-        "A set of tools and utilities to optimize React applications, reducing bundle size by 40% and improving render performance.",
+        "A backend API service for managing multi-tenant SaaS subscriptions, handling user management, billing, and access control with flexible plans, automation, and integrations.",
       image:
         "https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
-      category: "contributions",
-      tag: "Contribution",
+      category: "personal",
+      tag: "Personal",
       subTag: "Open Source",
       tagColor: "bg-chocolate-accent text-chocolate-dark",
-      technologies: ["React", "Webpack", "Babel"],
+      technologies: ["FastAPI", "REST", "Python"],
       links: [
         { text: "View Project", url: "#" },
-        { text: "GitHub", url: "#" },
+        { text: "GitHub", url: "https://github.com/BlacAc3/subscription-saas" },
       ],
     },
     {
       id: 2,
-      title: "Luxury Watch Store",
+      title: "Zloan",
       description:
-        "A high-end e-commerce platform for luxury watches with AR try-on feature, integrated payment processing, and inventory management.",
+        "A comprehensive loan management application that helps users apply for loans, track payments, and manage repayment schedules.",
       image:
         "https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1469&q=80",
-      category: "freelance",
-      tag: "Freelance",
-      subTag: "E-commerce",
+      category: "personal",
+      tag: "personal",
+      subTag: "Finance",
       tagColor: "bg-blue-500 text-white",
-      technologies: ["Next.js", "Node.js", "Stripe", "AR.js"],
-      links: [
-        { text: "View Project", url: "#" },
-        { text: "Case Study", url: "#" },
-      ],
+      technologies: ["Django", "React", "PostgreSQL"],
+      links: [{ text: "Case Study", url: "https://zloan.vercel.app" }],
     },
     {
       id: 3,
-      title: "FocusFlow",
+      title: "Job Management API",
       description:
-        "A Pomodoro timer app with task management, analytics, and distraction blocking features to boost productivity.",
+        "A RESTful API service for job management that enables tracking applications, interviews, and offers with status updates and deadline notifications for job seekers.",
       image:
         "https://images.unsplash.com/photo-1555774698-0f77e70ac3f0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
       category: "personal",
       tag: "Personal",
       subTag: "Productivity",
       tagColor: "bg-purple-500 text-white",
-      technologies: ["Electron", "React", "IndexedDB", "D3.js"],
+      technologies: ["Node.js", "Express", "MongoDB"],
       links: [
         { text: "View Project", url: "#" },
-        { text: "GitHub", url: "#" },
-        { text: "Download", url: "#" },
+        {
+          text: "GitHub",
+          url: "https://github.com/BlacAc3/job-management-site",
+        },
       ],
     },
     {
       id: 4,
-      title: "Cloud Migration Toolkit",
+      title: "Telegram Channel Copy Bot",
       description:
-        "Developed as part of Google Cloud's partner program, this toolkit helps enterprises migrate legacy systems to cloud infrastructure.",
+        "A Telegram bot that automatically copies messages, media, files and other content from public channels to target channels, preserving formatting and attachments for seamless content syndication.",
       image:
         "https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
-      category: "affiliations",
-      tag: "Affiliation",
-      subTag: "Google",
+      category: "personal",
+      tag: "Personal",
+      subTag: "Open source",
       tagColor: "bg-green-500 text-white",
-      technologies: ["GCP", "Terraform", "Python", "Kubernetes"],
+      technologies: ["Telegram", "Python"],
       links: [
         { text: "View Project", url: "#" },
-        { text: "Documentation", url: "#" },
+        { text: "GitHub", url: "https://github.com/BlacAc3/tele-copy" },
       ],
     },
     {
       id: 5,
-      title: "Firefox DevTools Extension",
+      title: "Programming Language Compiler",
       description:
-        "Contributed to the Firefox DevTools extension API, enabling better debugging capabilities for web developers.",
+        "A custom compiler for a simple programming language, implementing lexical analysis, parsing, semantic analysis, and code generation. Features include basic syntax validation, type checking, and compilation to a target bytecode or machine code.",
       image:
         "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=765&q=80",
-      category: "contributions",
-      tag: "Contribution",
-      subTag: "Mozilla",
+      category: "personal",
+      tag: "personal",
+      subTag: "Programming",
       tagColor: "bg-chocolate-accent text-chocolate-dark",
-      technologies: ["JavaScript", "WebExtensions", "Firefox"],
+      technologies: ["Python"],
       links: [
         { text: "View Project", url: "#" },
-        { text: "GitHub", url: "#" },
-      ],
-    },
-    {
-      id: 6,
-      title: "Telemedicine Platform",
-      description:
-        "A HIPAA-compliant telemedicine solution with video consultations, prescription management, and patient records.",
-      image:
-        "https://images.unsplash.com/photo-1521791055366-0d553872125f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1469&q=80",
-      category: "freelance",
-      tag: "Freelance",
-      subTag: "Healthcare",
-      tagColor: "bg-blue-500 text-white",
-      technologies: ["React Native", "Node.js", "WebRTC", "MongoDB"],
-      links: [
-        { text: "Case Study", url: "#" },
-        { text: "Testimonials", url: "#" },
+        { text: "GitHub", url: "https://github.com/BlacAc3/ace_compiler" },
       ],
     },
   ];
