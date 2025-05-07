@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { gsap } from "gsap";
-import me from "../../public/me.jpg";
+import me from "../../public/me.webp";
 
 const HeroSection = () => {
   const titleRef = useRef(null);

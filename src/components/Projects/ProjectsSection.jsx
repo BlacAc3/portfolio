@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence, useAnimation } from "framer-motion";
 import { useInView } from "react-intersection-observer";
-import { useCursor } from "../../contexts/CursorContext";
 import ProjectCard from "./ProjectCard";
+import zloanPic from "../../public/zloan.webp";
+import jobApiPic from "../../public/jobApi.webp";
+import primersGptPic from "../../public/primersGPT.webp";
 
 const ProjectsSection = () => {
   const [activeFilter, setActiveFilter] = useState("all");
@@ -46,8 +48,7 @@ const ProjectsSection = () => {
       title: "Zloan",
       description:
         "A comprehensive loan management application that helps users apply for loans, track payments, and manage repayment schedules.",
-      image:
-        "https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1469&q=80",
+      image: zloanPic,
       category: "personal",
       tag: "personal",
       subTag: "Finance",
@@ -60,8 +61,7 @@ const ProjectsSection = () => {
       title: "Job Management API",
       description:
         "A RESTful API service for job management that enables tracking applications, interviews, and offers with status updates and deadline notifications for job seekers.",
-      image:
-        "https://images.unsplash.com/photo-1555774698-0f77e70ac3f0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
+      image: jobApiPic,
       category: "personal",
       tag: "Personal",
       subTag: "Productivity",
@@ -81,8 +81,8 @@ const ProjectsSection = () => {
         "A Telegram bot that automatically copies messages, media, files and other content from public channels to target channels, preserving formatting and attachments for seamless content syndication.",
       image:
         "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=765&q=80",
-      category: "personal",
-      tag: "Personal",
+      category: "contributions",
+      tag: "contributions",
       subTag: "Open source",
       tagColor: "bg-green-500 text-white",
       technologies: ["Telegram", "Python"],
@@ -109,8 +109,7 @@ const ProjectsSection = () => {
       title: "PrimersGPT",
       description:
         "A specialized AI chatbot designed to provide concise, accurate information on complex topics. It transforms technical concepts into easy-to-understand primers, offering personalized learning paths based on user expertise and adapting its responses to match individual learning styles. The bot is fully tailored for the company's specific needs, preferences, and incorporates company details to ensure consistent brand voice and domain-specific knowledge alignment.",
-      image:
-        "https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
+      image: primersGptPic,
       category: "freelance",
       tag: "Freelance",
       subTag: "AI Chatbot",
@@ -157,14 +156,14 @@ const ProjectsSection = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.5 }}
         >
-          <div className="inline-flex rounded-md shadow-sm" role="group">
+          <div className="flex flex-wrap justify-center gap-2" role="group">
             {filterButtons.map((button, index) => (
               <motion.button
                 key={index}
                 type="button"
                 className={`
-                        px-4 py-2 text-sm font-medium
-                        ${index === 0 ? "rounded-l-lg" : index === filterButtons.length - 1 ? "rounded-r-lg" : ""}
+                        px-3 py-2 text-sm font-medium
+                        rounded-lg
                         border border-chocolate-accent
                         ${activeFilter === button.filter ? "bg-chocolate-accent text-chocolate-dark" : "text-chocolate-light-accent hover:bg-chocolate-medium"}
                       `}
@@ -200,7 +199,7 @@ const ProjectsSection = () => {
           </AnimatePresence>
         </motion.div>
 
-        <motion.div
+        {/* <motion.div
           className="text-center mt-12"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -215,7 +214,7 @@ const ProjectsSection = () => {
             View All Projects
             <i className="fas fa-arrow-right ml-2"></i>
           </motion.a>
-        </motion.div>
+        </motion.div> */}
       </div>
     </section>
   );

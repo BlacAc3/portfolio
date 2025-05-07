@@ -9,7 +9,7 @@ import {
   FaMedium,
   FaDev,
 } from "react-icons/fa";
-import me from "../../public/me.jpg";
+import me from "../../public/me.webp";
 
 const AboutSection = () => {
   const controls = useAnimation();
@@ -175,15 +175,15 @@ const AboutSection = () => {
                       Backend Engineer
                     </h5>
                     <p className="text-chocolate-light-accent">
-                      Techivate (2024)
+                      Techivate (2023)
                     </p>
                   </div>
                   <div className="mb-6">
                     <h5 className="font-medium text-chocolate-accent">
-                      Django Developer
+                      Python Developer(Django)
                     </h5>
                     <p className="text-chocolate-light-accent">
-                      Jaa Africa (2025-present)
+                      Jaa Africa (April 2025 - present)
                     </p>
                   </div>
                 </div>
