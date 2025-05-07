@@ -38,7 +38,6 @@ const ProjectsSection = () => {
       tagColor: "bg-chocolate-accent text-chocolate-dark",
       technologies: ["FastAPI", "REST", "Python"],
       links: [
-        { text: "View Project", url: "#" },
         { text: "GitHub", url: "https://github.com/BlacAc3/subscription-saas" },
       ],
     },
@@ -54,7 +53,7 @@ const ProjectsSection = () => {
       subTag: "Finance",
       tagColor: "bg-blue-500 text-white",
       technologies: ["Django", "React", "PostgreSQL"],
-      links: [{ text: "Case Study", url: "https://zloan.vercel.app" }],
+      links: [{ text: "View Project", url: "https://zloan.vercel.app" }],
     },
     {
       id: 3,
@@ -69,7 +68,6 @@ const ProjectsSection = () => {
       tagColor: "bg-purple-500 text-white",
       technologies: ["Node.js", "Express", "MongoDB"],
       links: [
-        { text: "View Project", url: "#" },
         {
           text: "GitHub",
           url: "https://github.com/BlacAc3/job-management-site",
@@ -82,16 +80,13 @@ const ProjectsSection = () => {
       description:
         "A Telegram bot that automatically copies messages, media, files and other content from public channels to target channels, preserving formatting and attachments for seamless content syndication.",
       image:
-        "https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
+        "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=765&q=80",
       category: "personal",
       tag: "Personal",
       subTag: "Open source",
       tagColor: "bg-green-500 text-white",
       technologies: ["Telegram", "Python"],
-      links: [
-        { text: "View Project", url: "#" },
-        { text: "GitHub", url: "https://github.com/BlacAc3/tele-copy" },
-      ],
+      links: [{ text: "GitHub", url: "https://github.com/BlacAc3/tele-copy" }],
     },
     {
       id: 5,
@@ -99,16 +94,29 @@ const ProjectsSection = () => {
       description:
         "A custom compiler for a simple programming language, implementing lexical analysis, parsing, semantic analysis, and code generation. Features include basic syntax validation, type checking, and compilation to a target bytecode or machine code.",
       image:
-        "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=765&q=80",
+        "https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
       category: "personal",
       tag: "personal",
       subTag: "Programming",
       tagColor: "bg-chocolate-accent text-chocolate-dark",
       technologies: ["Python"],
       links: [
-        { text: "View Project", url: "#" },
         { text: "GitHub", url: "https://github.com/BlacAc3/ace_compiler" },
       ],
+    },
+    {
+      id: 6,
+      title: "PrimersGPT",
+      description:
+        "A specialized AI chatbot designed to provide concise, accurate information on complex topics. It transforms technical concepts into easy-to-understand primers, offering personalized learning paths based on user expertise and adapting its responses to match individual learning styles. The bot is fully tailored for the company's specific needs, preferences, and incorporates company details to ensure consistent brand voice and domain-specific knowledge alignment.",
+      image:
+        "https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
+      category: "freelance",
+      tag: "Freelance",
+      subTag: "AI Chatbot",
+      tagColor: "bg-chocolate-accent text-chocolate-dark",
+      technologies: ["React", "n8n"],
+      links: [{ text: "View Project", url: "https://primersgpt.vercel.app/" }],
     },
   ];
 

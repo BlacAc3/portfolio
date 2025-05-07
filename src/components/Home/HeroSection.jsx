@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { gsap } from "gsap";
+import me from "../../public/me.jpg";
 
 const HeroSection = () => {
   const titleRef = useRef(null);
@@ -35,7 +36,7 @@ const HeroSection = () => {
         >
           <div className="w-40 h-40 mx-auto rounded-full overflow-hidden border-4 border-chocolate-accent pulse">
             <img
-              src="/me.jpg"
+              src={me}
               alt="Profile"
               className="w-full h-full object-cover"
             />

@@ -9,6 +9,7 @@ import {
   FaMedium,
   FaDev,
 } from "react-icons/fa";
+import me from "../../public/me.jpg";
 
 const AboutSection = () => {
   const controls = useAnimation();
@@ -97,7 +98,7 @@ const AboutSection = () => {
               transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }}
             >
               <img
-                src="/me.jpg"
+                src={me}
                 alt="About Me"
                 className="w-full h-full object-cover"
               />
