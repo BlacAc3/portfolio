@@ -97,7 +97,7 @@ const AboutSection = () => {
               transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }}
             >
               <img
-                src="public/me.jpg"
+                src="me.jpg"
                 alt="About Me"
                 className="w-full h-full object-cover"
               />
