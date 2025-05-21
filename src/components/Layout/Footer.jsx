@@ -23,7 +23,7 @@ const Footer = () => {
               Blacac3 Portfolio
             </motion.span>
             <p className="text-chocolate-light-accent mt-1">
-              © {currentYear} Alex Developer. All rights reserved.
+              © {currentYear} Blacac3 Developer. All rights reserved.
             </p>
           </motion.div>
 
