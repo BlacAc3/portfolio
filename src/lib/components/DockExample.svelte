@@ -14,11 +14,6 @@
     import DockIcon from "./DockIcon.svelte";
 
     let navs = {
-        navbar: [
-            { label: "Home", icon: Home, href: "#" },
-            { label: "Blog", icon: PencilLine, href: "#" },
-            { label: "Developer", icon: TvMinimalPlay, href: "#" },
-        ],
         contact: [
             { label: "Github", icon: GithubSvg, href: "#" },
             { label: "LinkedIn", icon: LinkedInSvg, href: "#" },
@@ -44,30 +39,6 @@
             let:distance
             let:magnification
         >
-            {#each navs.navbar as item}
-                <DockIcon
-                    {mouseX}
-                    {magnification}
-                    {distance}
-                    class="text-[#FED7AA] "
-                >
-                    <Tooltip.Root>
-                        <Tooltip.Trigger
-                            class="hover:bg-[#392D25] transition-all duration-200 rounded-full p-3 mx-0"
-                        >
-                            <svelte:component
-                                this={item.icon}
-                                size={22}
-                                strokeWidth={2.2}
-                            />
-                        </Tooltip.Trigger>
-                        <Tooltip.Content sideOffset={8}>
-                            <p>{item.label}</p>
-                        </Tooltip.Content>
-                    </Tooltip.Root>
-                </DockIcon>
-            {/each}
-            <Separator orientation="vertical" class="h-full w-[0.6px]" />
             {#each navs.contact as item}
                 <DockIcon {mouseX} {magnification} {distance}>
                     <Tooltip.Root>
