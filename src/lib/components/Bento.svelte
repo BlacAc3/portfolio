@@ -35,10 +35,8 @@
             class="grid grid-cols-12 gap-4 w-full"
             style="grid-auto-rows: {$viewportHeight / numberOfRows}px;"
         >
-            <MagicCard
-                class="p-6 bg-[#231B15] text-slate-300 flex flex-col gap-8 border-orange-200 justify-end rounded-md col-span-5 cursor-pointer hover:shadow-md whitespace-nowrap text-4xl group  transition-all duration-300"
-                gradientColor="#58402F"
-                gradientSize={300}
+            <div
+                class="col-span-5 p-6 bg-[#4A2E19]/60 duration-100 ease-in-out hover:scale-[1.02] text-slate-300 flex flex-col gap-8 border border-orange-300/40 justify-end rounded-md cursor-pointer shadow-[#2C2521] hover:cursor-pointer shadow-md whitespace-nowrap text-4xl group transition-all duration-400"
             >
                 <BoxReveal boxColor={"#5046e6"} duration={0.5}>
                     <h1
@@ -57,33 +55,23 @@
                         into pixel-perfect reality.” - Ezeala Aaron
                     </p>
                 </BoxReveal>
-            </MagicCard>
+            </div>
             <!-- <div class="flex w-full flex-col gap-4 h-[250px] lg:flex-row"></div> -->
-            <MagicCard
-                class="p-6 bg-[#382d25] text-slate-300 flex flex-col gap-7 border-transparent justify-end rounded-md col-span-3 cursor-pointer hover:shadow-md whitespace-nowrap text-4xl group transition-all duration-300"
-                gradientColor="#58402F"
-                gradientSize={300}
-            ></MagicCard>
-            <MagicCard
-                class="p-6 bg-[#382d25] text-slate-300 flex flex-col gap-7 border-transparent justify-end rounded-md col-span-4 cursor-pointer hover:shadow-md whitespace-nowrap text-4xl group transition-all duration-300"
-                gradientColor="#58402F"
-                gradientSize={300}
-            ></MagicCard>
-            <MagicCard
-                class="p-6 bg-[#382d25] text-slate-300 flex flex-col gap-7 border-transparent justify-end rounded-md col-span-4 cursor-pointer hover:shadow-md whitespace-nowrap text-4xl group transition-all duration-300"
-                gradientColor="#58402F"
-                gradientSize={300}
-            ></MagicCard>
-            <MagicCard
-                class="p-6 bg-[#382d25] text-slate-300 flex flex-col gap-7 border-transparent justify-end rounded-md col-span-4 cursor-pointer hover:shadow-md whitespace-nowrap text-4xl group transition-all duration-300"
-                gradientColor="#58402F"
-                gradientSize={300}
-            ></MagicCard>
-            <MagicCard
-                class="p-6 bg-[#382d25] text-slate-300 flex flex-col gap-7 border-transparent justify-end rounded-md col-span-4 cursor-pointer hover:shadow-md whitespace-nowrap text-4xl group transition-all duration-300"
-                gradientColor="#58402F"
-                gradientSize={300}
-            ></MagicCard>
+            <div
+                class="col-span-3 p-6 bg-[#4A2E19]/60 duration-100 ease-in-out hover:scale-[1.02] text-slate-300 flex flex-col gap-8 border border-orange-300/40 justify-end rounded-md cursor-pointer shadow-[#2C2521] hover:cursor-pointer shadow-md whitespace-nowrap text-4xl group transition-all"
+            ></div>
+            <div
+                class="col-span-4 p-6 bg-[#4A2E19]/60 duration-100 ease-in-out hover:scale-[1.02] text-slate-300 flex flex-col gap-8 border border-orange-300/40 justify-end rounded-md cursor-pointer shadow-[#2C2521] hover:cursor-pointer shadow-md whitespace-nowrap text-4xl group transition-all"
+            ></div>
+            <div
+                class="col-span-4 p-6 bg-[#4A2E19]/60 duration-100 ease-in-out hover:scale-[1.02] text-slate-300 flex flex-col gap-8 border border-orange-300/40 justify-end rounded-md cursor-pointer shadow-[#2C2521] hover:cursor-pointer shadow-md whitespace-nowrap text-4xl group transition-all"
+            ></div>
+            <div
+                class="col-span-4 p-6 bg-[#4A2E19]/60 duration-100 ease-in-out hover:scale-[1.02] text-slate-300 flex flex-col gap-8 border border-orange-300/40 justify-end rounded-md cursor-pointer shadow-[#2C2521] hover:cursor-pointer shadow-md whitespace-nowrap text-4xl group transition-all"
+            ></div>
+            <div
+                class="col-span-4 p-6 bg-[#4A2E19]/60 duration-100 ease-in-out hover:scale-[1.02] text-slate-300 flex flex-col gap-8 border border-orange-300/40 justify-end rounded-md cursor-pointer shadow-[#2C2521] hover:cursor-pointer shadow-md whitespace-nowrap text-4xl group transition-all"
+            ></div>
         </ul>
     </div>
 </div>
