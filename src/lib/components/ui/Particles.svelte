@@ -7,7 +7,7 @@
     export let ease: number = 50;
     export let size: number = 0.4;
     export let refresh: boolean = true;
-    export let color: string = "#ffffff";
+    export let color: string = "#ffffff"; // This is where you can change the base color. Use hex format.
     export let vx: number = 0;
     export let vy: number = 0;
 
@@ -36,6 +36,7 @@
         return [red, green, blue];
     }
 
+    // Convert the provided color prop to RGB
     const rgb = hexToRgb(color);
 
     function circleParams() {
@@ -45,7 +46,9 @@
         const translateY = 0;
         const pSize = Math.floor(Math.random() * 2) + size;
         const alpha = 0;
-        const targetAlpha = parseFloat((Math.random() * 0.6 + 0.1).toFixed(1));
+        // This targetAlpha determines the maximum transparency of a circle (0.2 to 1)
+        // Increase the lower bound (0.2) to make circles less transparent overall.
+        const targetAlpha = parseFloat((Math.random() * 0.8 + 0.8).toFixed(1));
         const dx = (Math.random() - 0.5) * 0.1;
         const dy = (Math.random() - 0.5) * 0.1;
         const magnetism = 0.1 + Math.random() * 4;
@@ -88,6 +91,8 @@
             context.translate(translateX, translateY);
             context.beginPath();
             context.arc(x, y, size, 0, 2 * Math.PI);
+            // This line sets the color and transparency for drawing.
+            // The `alpha` variable is calculated based on distance from edge and targetAlpha.
             context.fillStyle = `rgba(${rgb.join(", ")}, ${alpha})`;
             context.fill();
             context.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -131,6 +136,8 @@
                     circle.alpha = circle.targetAlpha;
                 }
             } else {
+                // This line adjusts the alpha based on distance to the edge
+                // To make them generally brighter closer to the edge, you could potentially adjust the '20' value in remapValue or the remap range.
                 circle.alpha = circle.targetAlpha * remapClosestEdge;
             }
             circle.x += circle.dx + vx;

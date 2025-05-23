@@ -13,7 +13,7 @@
         viewportHeight.set(window.innerHeight - 100);
     }
     const toggleExpand = () => {
-        expanded = !expanded;
+        expanded = false;
     };
 
     // Subscribe to viewportHeight and log its value
@@ -36,35 +36,63 @@
     };
 </script>
 
-<div class="text-white flex justify-center items-center w-full">
+<div class="text-white flex justify-center items-center w-screen">
     <div
-        class={`w-full flex justify-center items-center p-4 pb-2 lg:p-16 h-screen`}
+        class={`w-full flex justify-center items-center pb-2 lg:px-16 h-screen`}
     >
         <ul
             class="grid grid-cols-12 gap-4 w-full"
-            style="grid-auto-rows: {$viewportHeight / numberOfRows}px;"
+            style="grid-auto-rows: {$viewportHeight / numberOfRows - 30}px;"
         >
-            {#if expanded}
-                <Me expanded={false} />
-                {console.log(expanded)}
-            {/if}
-            <Me on:expand={toggleExpand} {expanded} />
+            <Me
+                className="col-span-5 text-slate-300 flex flex-col gap-4 justify-end whitespace-nowrap text-4xl"
+                on:expand={toggleExpand}
+                {expanded}
+            >
+                <BoxReveal boxColor={"#5046e6"} duration={0.5}>
+                    <h1
+                        class="text-slate-300 text-5xl group-hover:text-brown-700 transition-all duration-500 flex justify-start font-semibold"
+                    >
+                        Ezeala Aaron
+                    </h1>
+                </BoxReveal>
+                <BoxReveal boxColor={"#5046e6"} duration={0.5}>
+                    <p class="text-2xl">Software Engineer</p>
+                </BoxReveal>
 
-            <div
-                class="col-span-3 p-6 bg-[#4A2E19]/60 duration-100 ease-in-out hover:scale-[1.02] text-slate-300 flex flex-col gap-8 border border-orange-300/40 justify-end rounded-md cursor-pointer shadow-[#2C2521] hover:cursor-pointer shadow-md whitespace-nowrap text-4xl group transition-all"
-            ></div>
-            <div
-                class="col-span-4 p-6 bg-[#4A2E19]/60 duration-100 ease-in-out hover:scale-[1.02] text-slate-300 flex flex-col gap-8 border border-orange-300/40 justify-end rounded-md cursor-pointer shadow-[#2C2521] hover:cursor-pointer shadow-md whitespace-nowrap text-4xl group transition-all"
-            ></div>
-            <div
-                class="col-span-4 p-6 bg-[#4A2E19]/60 duration-100 ease-in-out hover:scale-[1.02] text-slate-300 flex flex-col gap-8 border border-orange-300/40 justify-end rounded-md cursor-pointer shadow-[#2C2521] hover:cursor-pointer shadow-md whitespace-nowrap text-4xl group transition-all"
-            ></div>
-            <div
-                class="col-span-4 p-6 bg-[#4A2E19]/60 duration-100 ease-in-out hover:scale-[1.02] text-slate-300 flex flex-col gap-8 border border-orange-300/40 justify-end rounded-md cursor-pointer shadow-[#2C2521] hover:cursor-pointer shadow-md whitespace-nowrap text-4xl group transition-all"
-            ></div>
-            <div
-                class="col-span-4 p-6 bg-[#4A2E19]/60 duration-100 ease-in-out hover:scale-[1.02] text-slate-300 flex flex-col gap-8 border border-orange-300/40 justify-end rounded-md cursor-pointer shadow-[#2C2521] hover:cursor-pointer shadow-md whitespace-nowrap text-4xl group transition-all"
-            ></div>
+                <BoxReveal boxColor={"#5046e6"} duration={0.5}>
+                    <p class="text-sm italic text-left text-wrap">
+                        “Turning coffee into code, bugs into features, and ideas
+                        into pixel-perfect reality.” - Ezeala Aaron
+                    </p>
+                </BoxReveal>
+            </Me>
+
+            <Me
+                className="col-span-3 text-slate-300 flex flex-col gap-4 justify-end whitespace-nowrap text-4xl"
+                on:expand={toggleExpand}
+                {expanded}
+            />
+            <Me
+                className="col-span-4 row-span-2 p-6 duration-100 ease-in-out text-slate-300 flex flex-col gap-8 border border-orange-300/40 justify-end rounded-md cursor-pointer shadow-[#2C2521] hover:cursor-pointer shadow-md whitespace-nowrap text-4xl group transition-all"
+                on:expand={toggleExpand}
+                {expanded}
+            />
+            <Me
+                className="col-span-4 p-6 duration-100 ease-in-out text-slate-300 flex flex-col gap-8 border border-orange-300/40 justify-end rounded-md cursor-pointer shadow-[#2C2521] hover:cursor-pointer shadow-md whitespace-nowrap text-4xl group transition-all"
+                on:expand={toggleExpand}
+                {expanded}
+            />
+            <Me
+                className="col-span-4 p-6 duration-100 ease-in-out text-slate-300 flex flex-col gap-8 border border-orange-300/40 justify-end rounded-md cursor-pointer shadow-[#2C2521] hover:cursor-pointer shadow-md whitespace-nowrap text-4xl group transition-all"
+                on:expand={toggleExpand}
+                {expanded}
+            />
+            <!-- <Me
+                className="col-span-4 p-6 duration-100 ease-in-out text-slate-300 flex flex-col gap-8 border border-orange-300/40 justify-end rounded-md cursor-pointer shadow-[#2C2521] hover:cursor-pointer shadow-md whitespace-nowrap text-4xl group transition-all"
+                on:expand={toggleExpand}
+                {expanded}
+            /> -->
         </ul>
     </div>
 </div>

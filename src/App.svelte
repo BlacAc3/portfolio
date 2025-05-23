@@ -2,13 +2,14 @@
     import "./app.css";
     import Bento from "$lib/components/Bento.svelte";
     import NavBar from "$lib/components/NavBar.svelte";
+    import Cursor from "$lib/components/ui/Cursor.svelte";
     import Particles from "$lib/components/ui/Particles.svelte";
     import MagicCard from "$lib/components/ui/MagicCard.svelte";
 </script>
 
-<main class="relative bg-[#1D1B1A]">
+<main class="relative bg-[#1D1B1A] no-cursor">
     <MagicCard
-        class="whitespace-pre-wrap bg-gradient-to-b from-black to-gray-300/80 bg-clip-text text-center text-8xl font-semibold leading-none text-transparent dark:from-white dark:to-slate-900/10"
+        class="whitespace-pre-wrap bg-transparent font-semibold leading-none text-transparent "
         gradientColor="#58402F"
         gradientSize={300}
     >
@@ -16,7 +17,12 @@
         <Bento />
     </MagicCard>
     <Particles
-        className="absolute inset-0 pointer-events-none"
+        className="absolute inset-0 pointer-events-none h-full"
         refresh={true}
     />
+
+    <Cursor />
 </main>
+
+<style>
+</style>
