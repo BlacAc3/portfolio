@@ -1,14 +1,14 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState, ChangeEvent, FormEvent } from "react";
 import { motion, useAnimation } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import {
   FaGithub,
   FaLinkedin,
   FaTwitter,
-  FaInstagram,
-  FaMedium,
 } from "react-icons/fa";
 import { MdEmail, MdPhone, MdLocationOn } from "react-icons/md";
+
+type SubmitStatus = "success" | "error" | null;
 
 const ContactSection = () => {
   const controls = useAnimation();
@@ -20,7 +20,7 @@ const ContactSection = () => {
     message: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState(null);
+  const [submitStatus, setSubmitStatus] = useState<SubmitStatus>(null);
 
   useEffect(() => {
     if (inView) {
@@ -28,7 +28,7 @@ const ContactSection = () => {
     }
   }, [controls, inView]);
 
-  const handleChange = (e) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData((prevState) => ({
       ...prevState,
@@ -36,7 +36,7 @@ const ContactSection = () => {
     }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
@@ -103,8 +103,6 @@ const ContactSection = () => {
     { icon: <FaGithub />, url: "https://github.com/blacac3" },
     { icon: <FaLinkedin />, url: "https://linkedin.com/in/aaron-ezeala" },
     { icon: <FaTwitter />, url: "https://twitter.com/blacac3_dev" },
-    // { icon: <FaInstagram />, url: "#" },
-    // { icon: <FaMedium />, url: "#" },
   ];
 
   return (
@@ -309,7 +307,7 @@ const ContactSection = () => {
                   name="message"
                   value={formData.message}
                   onChange={handleChange}
-                  rows="5"
+                  rows={5}
                   className="w-full px-4 py-3 form-input rounded-lg focus:ring-2 focus:ring-chocolate-accent focus:border-transparent bg-chocolate-dark bg-opacity-80 text-chocolate-light-accent border border-chocolate-light placeholder-chocolate-light"
                   placeholder="Hello, I'd like to talk about..."
                   whileFocus={{ scale: 1.01 }}

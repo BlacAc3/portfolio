@@ -1,7 +1,6 @@
-import React from "react";
+
 import { motion } from "framer-motion";
-import { useCursor } from "../../contexts/CursorContext";
-import { FaGithub, FaLinkedin, FaTwitter, FaInstagram } from "react-icons/fa";
+import { FaGithub, FaLinkedin, FaTwitter } from "react-icons/fa";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();

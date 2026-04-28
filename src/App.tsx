@@ -1,5 +1,3 @@
-import React from "react";
-import { CursorProvider } from "./contexts/CursorContext";
 import MouseTracker from "./components/Home/MouseTracker";
 import Navbar from "./components/Layout/Navbar";
 import HeroSection from "./components/Home/HeroSection";

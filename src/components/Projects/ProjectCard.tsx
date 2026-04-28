@@ -1,8 +1,27 @@
-import React from "react";
 import { motion } from "framer-motion";
-import { useCursor } from "../../contexts/CursorContext";
 
-const ProjectCard = ({ project }) => {
+interface ProjectLink {
+  url: string;
+  text: string;
+}
+
+interface Project {
+  category: string;
+  image: string;
+  title: string;
+  tagColor: string;
+  tag: string;
+  subTag: string;
+  description: string;
+  technologies: string[];
+  links: ProjectLink[];
+}
+
+interface ProjectCardProps {
+  project: Project;
+}
+
+const ProjectCard = ({ project }: ProjectCardProps) => {
   return (
     <motion.div
       className="project-card"

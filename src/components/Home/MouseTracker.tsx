@@ -1,12 +1,11 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 
 const MouseTracker = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [cursorVariant, setCursorVariant] = useState("default");
 
   useEffect(() => {
-    const mouseMove = (e) => {
+    const mouseMove = (e: MouseEvent) => {
       setMousePosition({
         x: e.clientX,
         y: e.clientY,
@@ -26,14 +25,6 @@ const MouseTracker = () => {
       y: mousePosition.y - 16,
       backgroundColor: "rgba(212, 167, 106, 0.3)",
     },
-    link: {
-      x: mousePosition.x - 32,
-      y: mousePosition.y - 32,
-      backgroundColor: "rgba(212, 167, 106, 0.8)",
-      height: 64,
-      width: 64,
-      mixBlendMode: "difference",
-    },
   };
 
   return (
@@ -41,7 +32,7 @@ const MouseTracker = () => {
       <motion.div
         className="cursor-dot hidden md:block"
         variants={variants}
-        animate={cursorVariant}
+        animate="default"
         transition={{ type: "spring", damping: 25, stiffness: 400 }}
         style={{
           position: "fixed",
