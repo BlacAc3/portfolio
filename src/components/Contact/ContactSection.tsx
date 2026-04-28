@@ -1,6 +1,5 @@
-import { useEffect, useState, ChangeEvent, FormEvent } from "react";
-import { motion, useAnimation } from "framer-motion";
-import { useInView } from "react-intersection-observer";
+import { useState, ChangeEvent, FormEvent } from "react";
+import { motion } from "framer-motion";
 import {
   FaGithub,
   FaLinkedin,
@@ -11,8 +10,6 @@ import { MdEmail, MdPhone, MdLocationOn } from "react-icons/md";
 type SubmitStatus = "success" | "error" | null;
 
 const ContactSection = () => {
-  const controls = useAnimation();
-  const [ref, inView] = useInView({ threshold: 0.1, triggerOnce: true });
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -21,12 +18,6 @@ const ContactSection = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<SubmitStatus>(null);
-
-  useEffect(() => {
-    if (inView) {
-      controls.start("visible");
-    }
-  }, [controls, inView]);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -108,25 +99,15 @@ const ContactSection = () => {
   return (
     <section
       id="contact"
-      className="py-20 px-4 sm:px-6 lg:px-8 section-gradient"
+      className="py-20 px-4 sm:px-6 lg:px-8"
     >
       <div className="max-w-7xl mx-auto">
-        <motion.h2
-          className="text-3xl md:text-4xl font-bold mb-12 text-center section-title"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.6 }}
-        >
-          <span className="text-chocolate-light-accent">Get In</span>
-          <span className="text-chocolate-accent"> Touch</span>
-        </motion.h2>
-
         <motion.div
-          ref={ref}
           className="flex flex-col lg:flex-row gap-12"
           variants={containerVariants}
           initial="hidden"
-          animate={controls}
+          whileInView="visible"
+          viewport={{ once: true }}
         >
           <motion.div className="lg:w-1/2" variants={itemVariants}>
             <motion.h3
@@ -136,7 +117,7 @@ const ContactSection = () => {
               Contact Information
             </motion.h3>
 
-            <motion.div className="space-y-6" variants={containerVariants}>
+            <motion.div className="space-y-6">
               <motion.div
                 className="flex items-start"
                 variants={itemVariants}
@@ -146,12 +127,12 @@ const ContactSection = () => {
                   <MdEmail className="text-chocolate-accent text-xl" />
                 </div>
                 <div className="ml-4">
-                  <h4 className="text-lg font-medium text-chocolate-light-accent">
+                  <h4 className="text-lg font-medium text-white">
                     Email
                   </h4>
                   <a
                     href="mailto:anomyace@gmail.com"
-                    className="text-chocolate-light-accent hover:text-chocolate-accent transition"
+                    className="text-white/60 hover:text-chocolate-accent transition"
                   >
                     anomyace@gmail.com
                   </a>
@@ -167,12 +148,12 @@ const ContactSection = () => {
                   <MdPhone className="text-chocolate-accent text-xl" />
                 </div>
                 <div className="ml-4">
-                  <h4 className="text-lg font-medium text-chocolate-light-accent">
+                  <h4 className="text-lg font-medium text-white">
                     Phone
                   </h4>
                   <a
                     href="tel:+2348059128741"
-                    className="text-chocolate-light-accent hover:text-chocolate-accent transition"
+                    className="text-white/60 hover:text-chocolate-accent transition"
                   >
                     +234 (805) 912-8741
                   </a>
@@ -188,16 +169,16 @@ const ContactSection = () => {
                   <MdLocationOn className="text-chocolate-accent text-xl" />
                 </div>
                 <div className="ml-4">
-                  <h4 className="text-lg font-medium text-chocolate-light-accent">
+                  <h4 className="text-lg font-medium text-white">
                     Location
                   </h4>
-                  <p className="text-chocolate-light-accent">Lagos, Nigeria</p>
+                  <p className="text-white/60">Lagos, Nigeria</p>
                 </div>
               </motion.div>
             </motion.div>
 
             <motion.div className="mt-10" variants={itemVariants}>
-              <h4 className="text-xl font-semibold mb-4 text-chocolate-light-accent">
+              <h4 className="text-xl font-semibold mb-4 text-white">
                 Follow Me
               </h4>
               <div className="flex space-x-6">
@@ -206,7 +187,7 @@ const ContactSection = () => {
                     key={index}
                     href={social.url}
                     target="_blank"
-                    className="social-icon text-2xl text-chocolate-light-accent hover:text-chocolate-accent"
+                    className="social-icon text-2xl text-white/60 hover:text-chocolate-accent"
                     whileHover={{ scale: 1.2, y: -5 }}
                     transition={{ type: "spring", stiffness: 300 }}
                   >
@@ -221,7 +202,6 @@ const ContactSection = () => {
             <motion.form
               onSubmit={handleSubmit}
               className="space-y-6"
-              variants={containerVariants}
             >
               {submitStatus === "success" && (
                 <div className="p-4 bg-green-100 text-green-800 rounded-lg mb-4">
@@ -238,7 +218,7 @@ const ContactSection = () => {
               <motion.div variants={formItemVariants}>
                 <label
                   htmlFor="name"
-                  className="block text-sm font-medium text-chocolate-light-accent mb-1"
+                  className="block text-sm font-medium text-white/60 mb-1"
                 >
                   Your Name
                 </label>
@@ -248,7 +228,7 @@ const ContactSection = () => {
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 form-input rounded-lg focus:ring-2 focus:ring-chocolate-accent focus:border-transparent bg-chocolate-dark bg-opacity-80 text-chocolate-light-accent border border-chocolate-light placeholder-chocolate-light"
+                  className="w-full px-4 py-3 rounded-lg focus:ring-2 focus:ring-chocolate-accent outline-none bg-white/5 text-white border border-white/10"
                   placeholder="John Doe"
                   whileFocus={{ scale: 1.01 }}
                   required
@@ -258,7 +238,7 @@ const ContactSection = () => {
               <motion.div variants={formItemVariants}>
                 <label
                   htmlFor="email"
-                  className="block text-sm font-medium text-chocolate-light-accent mb-1"
+                  className="block text-sm font-medium text-white/60 mb-1"
                 >
                   Email Address
                 </label>
@@ -268,7 +248,7 @@ const ContactSection = () => {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 form-input rounded-lg focus:ring-2 focus:ring-chocolate-accent focus:border-transparent bg-chocolate-dark bg-opacity-80 text-chocolate-light-accent border border-chocolate-light placeholder-chocolate-light"
+                  className="w-full px-4 py-3 rounded-lg focus:ring-2 focus:ring-chocolate-accent outline-none bg-white/5 text-white border border-white/10"
                   placeholder="john@example.com"
                   whileFocus={{ scale: 1.01 }}
                   required
@@ -278,7 +258,7 @@ const ContactSection = () => {
               <motion.div variants={formItemVariants}>
                 <label
                   htmlFor="subject"
-                  className="block text-sm font-medium text-chocolate-light-accent mb-1"
+                  className="block text-sm font-medium text-white/60 mb-1"
                 >
                   Subject
                 </label>
@@ -288,7 +268,7 @@ const ContactSection = () => {
                   name="subject"
                   value={formData.subject}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 form-input rounded-lg focus:ring-2 focus:ring-chocolate-accent focus:border-transparent bg-chocolate-dark bg-opacity-80 text-chocolate-light-accent border border-chocolate-light placeholder-chocolate-light"
+                  className="w-full px-4 py-3 rounded-lg focus:ring-2 focus:ring-chocolate-accent outline-none bg-white/5 text-white border border-white/10"
                   placeholder="Project Inquiry"
                   whileFocus={{ scale: 1.01 }}
                   required
@@ -298,7 +278,7 @@ const ContactSection = () => {
               <motion.div variants={formItemVariants}>
                 <label
                   htmlFor="message"
-                  className="block text-sm font-medium text-chocolate-light-accent mb-1"
+                  className="block text-sm font-medium text-white/60 mb-1"
                 >
                   Your Message
                 </label>
@@ -308,7 +288,7 @@ const ContactSection = () => {
                   value={formData.message}
                   onChange={handleChange}
                   rows={5}
-                  className="w-full px-4 py-3 form-input rounded-lg focus:ring-2 focus:ring-chocolate-accent focus:border-transparent bg-chocolate-dark bg-opacity-80 text-chocolate-light-accent border border-chocolate-light placeholder-chocolate-light"
+                  className="w-full px-4 py-3 rounded-lg focus:ring-2 focus:ring-chocolate-accent outline-none bg-white/5 text-white border border-white/10"
                   placeholder="Hello, I'd like to talk about..."
                   whileFocus={{ scale: 1.01 }}
                   required
@@ -319,9 +299,7 @@ const ContactSection = () => {
                 <motion.button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full px-6 py-3 bg-chocolate-accent text-chocolate-dark font-medium rounded-lg hover:bg-opacity-90 transition shadow-lg shadow-chocolate-accent/20 disabled:opacity-70"
-                  whileHover={{ scale: isSubmitting ? 1 : 1.02 }}
-                  whileTap={{ scale: isSubmitting ? 1 : 0.98 }}
+                  className="w-full px-6 py-3 bg-white text-black font-black uppercase tracking-widest rounded-lg hover:scale-[1.02] transition shadow-lg disabled:opacity-70"
                 >
                   {isSubmitting ? "Sending..." : "Send Message"}
                 </motion.button>

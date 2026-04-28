@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&family=Space+Grotesk:wght@300..700&display=swap");
 @import "tailwindcss";
 
 @theme {
@@ -8,36 +8,48 @@
   --color-chocolate-accent: #d4a76a;
   --color-chocolate-light-accent: #e8d5b5;
   
-  --font-apple: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-display: "Bricolage Grotesque", sans-serif;
+  --font-body: "Plus Jakarta Sans", sans-serif;
+  --font-tech: "Space Grotesk", sans-serif;
   
   --radius-apple: 32px;
   --gap-apple: 24px;
 }
 
 :root {
-    --apple-font: var(--font-apple);
+    --apple-font: var(--font-body);
     background-color: var(--color-chocolate-dark);
     color: white;
 }
 
 body {
-    font-family: var(--apple-font);
+    font-family: var(--font-body);
     -webkit-font-smoothing: antialiased;
     scroll-behavior: smooth;
     overflow-x: hidden;
+    background-color: var(--color-chocolate-dark);
+}
+
+h1, h2, h3, .font-display {
+    font-family: var(--font-display);
+}
+
+.font-tech {
+    font-family: var(--font-tech);
 }
 
 .glass-card {
-    background: rgba(255, 255, 255, 0.03);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.02);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .text-massive {
-    font-size: clamp(4rem, 15vw, 120px);
-    line-height: 0.85;
-    letter-spacing: -0.05em;
+    font-family: var(--font-display);
+    font-size: clamp(4rem, 15vw, 150px);
+    line-height: 0.8;
+    letter-spacing: -0.06em;
     font-weight: 800;
 }
 
@@ -53,7 +65,7 @@ body {
 }
 
 .scroll-section {
-    height: 200vh;
+    height: 120vh;
     position: relative;
 }
 
@@ -61,4 +73,13 @@ body {
     * {
         cursor: none !important;
     }
+}
+
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
 }

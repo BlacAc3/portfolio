@@ -1,96 +1,123 @@
-import { useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { useRef, useLayoutEffect } from "react";
+import { motion } from "framer-motion";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+gsap.registerPlugin(ScrollTrigger);
 
 const HeroSection = () => {
   const containerRef = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start start", "end end"]
-  });
+  const contentRef = useRef<HTMLDivElement>(null);
+  const title1Ref = useRef<HTMLHeadingElement>(null);
+  const title2Ref = useRef<HTMLHeadingElement>(null);
+  const introRef = useRef<HTMLDivElement>(null);
+  const indicatorRef = useRef<HTMLDivElement>(null);
+  const meshRef = useRef<HTMLDivElement>(null);
 
-  // Pillar 1: Scrollytelling - Transform based on scroll progress
-  const opacity = useTransform(scrollYProgress, [0, 0.4, 0.6], [1, 1, 0]);
-  const scale = useTransform(scrollYProgress, [0, 0.4], [1, 0.9]);
-  const textY = useTransform(scrollYProgress, [0, 0.4], [0, -50]);
-  
-  // Specific title transforms for that "scrubber" feel
-  const title1X = useTransform(scrollYProgress, [0, 0.3], [0, -100]);
-  const title2X = useTransform(scrollYProgress, [0, 0.3], [0, 100]);
-  const titleOpacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
+  useLayoutEffect(() => {
+    const ctx = gsap.context(() => {
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: containerRef.current,
+          start: "top top",
+          end: "bottom top",
+          scrub: 1,
+        }
+      });
+
+      // Match the original Framer Motion logic exactly
+      tl.to(contentRef.current, { scale: 0.85, opacity: 0, y: -100, ease: "none" }, 0)
+        .to(title1Ref.current, { x: -150, ease: "none" }, 0)
+        .to(title2Ref.current, { x: 150, ease: "none" }, 0)
+        .to(meshRef.current, { scale: 1.5, ease: "none" }, 0)
+        .to(indicatorRef.current, { opacity: 0, ease: "none" }, 0);
+
+    }, containerRef);
+
+    return () => ctx.revert();
+  }, []);
 
   return (
     <section ref={containerRef} className="scroll-section" id="home">
       <div className="sticky-container">
-        <motion.div 
-          style={{ scale, opacity }}
-          className="max-w-7xl mx-auto px-6 text-center z-10 w-full"
-        >
-          {/* Pillar 2: Massive Typography & Negative Space */}
-          <div className="relative mb-24">
-            <motion.h1 
-              style={{ x: title1X, opacity: titleOpacity }}
-              className="text-massive text-white whitespace-nowrap"
-            >
-              DESIGNING
-            </motion.h1>
-            <motion.h1 
-              style={{ x: title2X, opacity: titleOpacity }}
-              className="text-massive text-chocolate-accent whitespace-nowrap"
-            >
-              THE FUTURE
-            </motion.h1>
+        <div className="absolute inset-0 overflow-hidden">
+          <motion.div 
+            ref={meshRef}
+            animate={{ 
+              scale: [1, 1.1, 1],
+              rotate: [0, 5, 0],
+            }}
+            transition={{ 
+              duration: 20, 
+              repeat: Infinity, 
+              ease: "linear" 
+            }}
+            className="absolute top-[-20%] left-[-10%] w-[140%] h-[140%] opacity-20"
+            style={{
+              background: `radial-gradient(circle at 50% 50%, var(--color-chocolate-accent) 0%, transparent 50%),
+                           radial-gradient(circle at 20% 80%, #3a2e26 0%, transparent 40%),
+                           radial-gradient(circle at 80% 20%, #1d1b1a 0%, transparent 40%)`
+            }}
+          />
+          <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
+        </div>
+
+        <div ref={contentRef} className="max-w-7xl mx-auto mt-24 px-6 pt-32 pb-40 text-center z-10 w-full flex flex-col justify-center min-h-screen">
+          <div className="relative mb-12">
+            <div className="overflow-hidden">
+              <h1 ref={title1Ref} className="text-[12vw] lg:text-[120px] font-black leading-[0.8] tracking-[-0.06em] text-white">
+                DESIGNING
+              </h1>
+            </div>
+            <div className="mt-4">
+              <h1 ref={title2Ref} className="text-[12vw] lg:text-[120px] font-black leading-[0.8] tracking-[-0.06em] text-chocolate-accent">
+                THE FUTURE
+              </h1>
+            </div>
           </div>
 
-          <motion.div 
-            style={{ y: textY }}
-            className="max-w-3xl mx-auto mt-12"
-          >
-            <h2 className="text-3xl md:text-5xl font-light mb-12 text-white/80 tracking-tight leading-tight">
-              I'm Aaron. I craft high-fidelity digital experiences that bridge the gap between imagination and reality.
+          <div ref={introRef} className="max-w-4xl mx-auto mt-12">
+            <h2 className="text-xl md:text-2xl italic font-light text-white/60 tracking-tight leading-relaxed mb-16 text-balance">
+              "Hi, I'm <span className="text-white font-medium">Aaron Ezeala</span>. <br />
+              I build high-fidelity digital interfaces and robust systems 
+              that define the next generation of the web."
             </h2>
             
-            <div className="flex justify-center space-x-8">
+            <div className="flex flex-col sm:flex-row pt-18 justify-center items-center gap-18">
               <motion.a
                 href="#projects"
-                className="px-10 py-5 bg-white text-black text-xl font-semibold rounded-full hover:scale-105 transition-transform"
+                className="group relative px-12 py-5 bg-white text-black text-lg font-bold rounded-full overflow-hidden transition-all"
+                whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                Explore Projects
+                <span className="relative z-10">Explore Work</span>
+                <div className="absolute inset-0 bg-chocolate-accent opacity-0 group-hover:opacity-100 transition-opacity" />
               </motion.a>
               <motion.a
                 href="#contact"
-                className="px-10 py-5 border border-white/20 text-white text-xl font-semibold rounded-full hover:bg-white/10 transition-colors"
+                className="px-12 py-5 border border-white/10 bg-white/5 backdrop-blur-md text-white text-lg font-bold rounded-full hover:bg-white/10 transition-all"
+                whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
                 Get in Touch
               </motion.a>
             </div>
-          </motion.div>
-        </motion.div>
-        
-        {/* Background Visuals - Glassmorphism & Depth */}
-        <div className="absolute inset-0 -z-10 overflow-hidden">
-          <motion.div 
-             style={{ scale: useTransform(scrollYProgress, [0, 1], [1, 1.5]) }}
-             className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[1000px] bg-chocolate-accent/10 blur-[150px] rounded-full" 
-          />
-          <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10 pointer-events-none" />
+          </div>
+        </div>
+
+        <div ref={indicatorRef} className="absolute bottom-10 left-1/2 -translate-x-1/2">
+          <div className="flex flex-col items-center gap-4">
+            <p className="text-[10px] uppercase tracking-[0.5em] text-white/30 font-bold">Initiate</p>
+            <div className="w-[1px] h-20 bg-gradient-to-b from-chocolate-accent to-transparent relative">
+              <motion.div 
+                animate={{ top: ["0%", "100%", "0%"] }}
+                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                className="absolute left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-chocolate-accent rounded-full shadow-[0_0_10px_var(--color-chocolate-accent)]"
+              />
+            </div>
+          </div>
         </div>
       </div>
-
-      <motion.div
-        className="fixed bottom-12 left-1/2 transform -translate-x-1/2 z-20"
-        style={{ opacity: titleOpacity }}
-      >
-        <div className="flex flex-col items-center">
-          <span className="text-xs uppercase tracking-[0.3em] mb-4 text-white/40 font-bold">Scroll to Begin</span>
-          <motion.div 
-            animate={{ y: [0, 12, 0] }}
-            transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
-            className="w-[2px] h-16 bg-gradient-to-b from-chocolate-accent to-transparent rounded-full"
-          />
-        </div>
-      </motion.div>
     </section>
   );
 };

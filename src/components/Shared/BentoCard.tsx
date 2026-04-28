@@ -1,5 +1,4 @@
 import { ReactNode } from 'react';
-import { motion } from 'framer-motion';
 
 interface BentoCardProps {
   children: ReactNode;
@@ -37,16 +36,7 @@ const BentoCard = ({
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ 
-        type: 'spring', 
-        stiffness: 100, 
-        damping: 15,
-        mass: 1
-      }}
+    <div
       className={`
         ${colSpans[colSpan] || ''} 
         ${rowSpans[rowSpan] || ''} 
@@ -62,7 +52,7 @@ const BentoCard = ({
       `}
     >
       {children}
-    </motion.div>
+    </div>
   );
 };
 

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
 import BentoGrid from "../Shared/BentoGrid";
 import BentoCard from "../Shared/BentoCard";
 import zloanPic from "../../public/zloan.webp";
@@ -79,29 +79,22 @@ const ProjectsSection = () => {
     : projects.filter(p => p.category === activeFilter);
 
   return (
-    <section id="projects" className="py-32 px-4 sm:px-6 lg:px-8 bg-chocolate-dark">
+    <section id="projects" className="py-20 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        <div className="flex flex-col md:flex-row justify-between items-end mb-20 gap-8">
-          <div>
-            <h2 className="text-5xl md:text-7xl font-bold tracking-tighter text-white mb-4">SELECTED <span className="text-chocolate-accent">WORKS</span></h2>
-            <p className="text-xl text-white/40 uppercase tracking-widest font-medium">Digital Product Design & Engineering</p>
-          </div>
-          
-          <div className="flex flex-wrap gap-3 bg-white/5 p-2 rounded-2xl border border-white/10">
-            {filterButtons.map((button) => (
-              <button
-                key={button.filter}
-                onClick={() => setActiveFilter(button.filter)}
-                className={`px-6 py-2 rounded-xl text-sm font-bold transition-all ${
-                  activeFilter === button.filter 
-                    ? "bg-chocolate-accent text-chocolate-dark" 
-                    : "text-white/60 hover:text-white hover:bg-white/5"
-                }`}
-              >
-                {button.name}
-              </button>
-            ))}
-          </div>
+        <div className="flex flex-wrap gap-3 bg-white/5 p-2 rounded-2xl border border-white/10 mb-20 w-fit mx-auto md:mx-0">
+          {filterButtons.map((button) => (
+            <button
+              key={button.filter}
+              onClick={() => setActiveFilter(button.filter)}
+              className={`px-6 py-2 rounded-xl text-sm font-bold transition-all ${
+                activeFilter === button.filter 
+                  ? "bg-chocolate-accent text-chocolate-dark" 
+                  : "text-white/60 hover:text-white hover:bg-white/5"
+              }`}
+            >
+              {button.name}
+            </button>
+          ))}
         </div>
 
         <BentoGrid>
