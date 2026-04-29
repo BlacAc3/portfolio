@@ -5,21 +5,24 @@ import BentoCard from "../Shared/BentoCard";
 import me from "../../public/me.webp";
 import { FaGithub, FaLinkedin, FaTimes } from "react-icons/fa";
 
+type ExpandedType = "journey" | "toolkit" | null;
+
 const AboutSection = () => {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [expandedType, setExpandedType] = useState<ExpandedType>(null);
 
   const skills = [
-    "Golang",
-    "TypeScript",
-    "React",
-    "Node.js",
-    "Python",
-    "Django",
-    "AWS",
-    "Docker",
-    "Kubernetes",
-    "GraphQL",
-    "FastAPI",
+    { name: "Golang", level: 90, category: "Backend" },
+    { name: "Python", level: 95, category: "Backend" },
+    { name: "Django", level: 92, category: "Backend" },
+    { name: "TypeScript", level: 88, category: "Frontend" },
+    { name: "React", level: 90, category: "Frontend" },
+    { name: "FastAPI", level: 85, category: "Backend" },
+    { name: "AWS", level: 80, category: "Infrastructure" },
+    { name: "Docker", level: 85, category: "Infrastructure" },
+    { name: "Kubernetes", level: 75, category: "Infrastructure" },
+    { name: "GraphQL", level: 82, category: "Backend" },
+    { name: "PostgreSQL", level: 90, category: "Database" },
+    { name: "Node.js", level: 85, category: "Backend" },
   ];
 
   const experiences = [
@@ -105,10 +108,9 @@ const AboutSection = () => {
     },
   ];
 
-  // Handle ESC key to close
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setIsExpanded(false);
+      if (e.key === "Escape") setExpandedType(null);
     };
     window.addEventListener("keydown", handleEsc);
     return () => window.removeEventListener("keydown", handleEsc);
@@ -118,7 +120,6 @@ const AboutSection = () => {
     <section id="about" className="py-20 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <BentoGrid>
-          {/* 1. Profile Image Card */}
           <BentoCard
             colSpan={1}
             rowSpan={1}
@@ -131,7 +132,6 @@ const AboutSection = () => {
             />
           </BentoCard>
 
-          {/* 2. Main Narrative */}
           <BentoCard colSpan={1} rowSpan={1} theme="glass">
             <div className="h-full flex flex-col justify-between">
               <h3 className="text-xl font-black leading-tight">
@@ -157,11 +157,11 @@ const AboutSection = () => {
             </div>
           </BentoCard>
 
-          {/* 3. MAJOR: Experience Card with Expansion Logic */}
+          {/* Journey Expansion */}
           <motion.div
             layoutId="journey-card"
-            className="md:col-span-2 md:row-span-2 cursor-pointer group relative"
-            onClick={() => setIsExpanded(true)}
+            className="md:col-span-2 md:row-span-2 cursor-pointer group"
+            onClick={() => setExpandedType("journey")}
           >
             <BentoCard colSpan={2} rowSpan={2} theme="dark" className="h-full">
               <div className="h-full flex flex-col pointer-events-none">
@@ -169,8 +169,8 @@ const AboutSection = () => {
                   <h4 className="text-[10px] uppercase tracking-[0.4em] font-black text-chocolate-accent">
                     Professional Journey
                   </h4>
-                  <span className="text-[10px] font-black text-white/20 group-hover:text-chocolate-accent transition-colors uppercase tracking-widest">
-                    Click to Expand
+                  <span className="text-[10px] font-black text-white/20 group-hover:text-chocolate-accent transition-colors uppercase tracking-widest font-tech">
+                    Explore
                   </span>
                 </div>
                 <div className="space-y-8">
@@ -194,26 +194,36 @@ const AboutSection = () => {
             </BentoCard>
           </motion.div>
 
-          {/* 4. Skills Card */}
-          <BentoCard colSpan={1} rowSpan={1} theme="accent">
-            <div className="h-full flex flex-col justify-between">
-              <h4 className="text-[10px] uppercase tracking-[0.3em] font-black opacity-60 font-tech">
-                Toolkit
-              </h4>
-              <div className="flex flex-wrap gap-2">
-                {skills.slice(0, 8).map((skill) => (
-                  <span
-                    key={skill}
-                    className="px-2 py-1 bg-black/10 rounded text-[10px] font-black font-tech"
-                  >
-                    {skill}
+          {/* Toolkit Expansion */}
+          <motion.div
+            layoutId="toolkit-card"
+            className="md:col-span-1 md:row-span-1 cursor-pointer group"
+            onClick={() => setExpandedType("toolkit")}
+          >
+            <BentoCard colSpan={1} rowSpan={1} className="h-full">
+              <div className="h-full flex flex-col justify-between pointer-events-none">
+                <div className="flex justify-between items-center">
+                  <h4 className="text-[10px] uppercase tracking-[0.3em] font-black opacity-60 font-tech">
+                    Toolkit
+                  </h4>
+                  <span className="text-[8px] font-black opacity-40 group-hover:opacity-100 transition-opacity uppercase tracking-widest font-tech">
+                    Details
                   </span>
-                ))}
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {skills.slice(0, 6).map((skill) => (
+                    <span
+                      key={skill.name}
+                      className="px-2 py-1 bg-black/10 rounded text-[10px] font-black font-tech"
+                    >
+                      {skill.name}
+                    </span>
+                  ))}
+                </div>
               </div>
-            </div>
-          </BentoCard>
+            </BentoCard>
+          </motion.div>
 
-          {/* 5. Stats Card */}
           <BentoCard colSpan={1} rowSpan={1} theme="glass">
             <div className="h-full flex flex-col justify-center text-center">
               <p className="text-5xl font-black text-chocolate-accent tracking-tighter font-tech">
@@ -226,35 +236,38 @@ const AboutSection = () => {
           </BentoCard>
         </BentoGrid>
 
-        {/* 6. MODAL EXPANSION */}
+        {/* MODAL ARCHITECTURE */}
         <AnimatePresence>
-          {isExpanded && (
+          {expandedType && (
             <>
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                onClick={() => setIsExpanded(false)}
-                className="fixed inset-0 bg-black/60 backdrop-blur-2xl z-[100] cursor-zoom-out"
+                onClick={() => setExpandedType(null)}
+                className="fixed inset-0 bg-black/80 backdrop-blur-3xl z-[199] cursor-zoom-out"
               />
               <motion.div
-                layoutId="journey-card"
-                className="fixed top-12 md:top-24 inset-x-6 bottom-2 bg-chocolate-dark z-[200] overflow-hidden flex flex-col rounded-[20px] shadow-[0_-20px_80px_-20px_rgba(0,0,0,0.8)]"
+                layoutId={
+                  expandedType === "journey" ? "journey-card" : "toolkit-card"
+                }
+                className="fixed top-12 md:top-24 inset-x-16 bottom-3 bg-chocolate-dark/40 backdrop-blur-2xl z-[200] overflow-hidden flex flex-col rounded-3xl shadow-[0_-20px_80px_-20px_rgba(0,0,0,0.9)] border border-white/10"
               >
-                <div className="p-5 pl-8 flex justify-between items-center border-b border-white/5 bg-white/2">
+                <div className="p-7 md:px-20 flex justify-between items-center border-b border-white/5 bg-white/2">
                   <div>
-                    <h4 className="text-xs uppercase tracking-[0.6em] font-black text-chocolate-accent mb-3 font-tech">
-                      Professional Journey
+                    <h4 className="text-xs uppercase tracking-[0.6em] font-black text-chocolate-accent mb-2 font-tech">
+                      {expandedType === "journey"
+                        ? "Professional Journey"
+                        : "Technical Proficiency"}
                     </h4>
-                    <p className="text-xl md:text-4xl font-black tracking-tighter mb-3 text-white">
-                      Full Timeline
-                    </p>
-                    <p className="text-[10px] uppercase tracking-[0.4em] font-black text-white/20">
-                      Continuous Evolution
+                    <p className="text-2xl md:text-4xl font-black tracking-tighter text-white uppercase">
+                      {expandedType === "journey"
+                        ? "Full Timeline"
+                        : "The Toolkit"}
                     </p>
                   </div>
                   <button
-                    onClick={() => setIsExpanded(false)}
+                    onClick={() => setExpandedType(null)}
                     className="p-4 bg-white/5 rounded-full hover:bg-white hover:text-black transition-all group"
                   >
                     <FaTimes
@@ -264,45 +277,87 @@ const AboutSection = () => {
                   </button>
                 </div>
 
-                <div className="flex-1 overflow-y-auto p-8 md:p-12 no-scrollbar scroll-smooth">
-                  <div className="max-w-5xl mx-auto space-y-16 py-8">
-                    {experiences.map((exp, i) => (
-                      <motion.div
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.2 + i * 0.05 }}
-                        key={i}
-                        className="border-l-2 border-chocolate-accent/20 pl-8 md:pl-12 relative"
-                      >
-                        <div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-chocolate-accent shadow-[0_0_15px_var(--color-chocolate-accent)]" />
-                        <div className="flex flex-col md:flex-row justify-between items-start mb-6 gap-4">
-                          <div>
-                            <p className="font-black text-2xl md:text-3xl text-white mb-2 tracking-tight">
-                              {exp.company}
-                            </p>
-                            <p className="text-chocolate-accent text-md font-bold font-tech uppercase tracking-widest">
-                              {exp.role}
-                            </p>
-                          </div>
-                          <span className="px-4 py-2 bg-white/5 rounded-full text-xs font-black text-white/40 font-tech whitespace-nowrap">
-                            {exp.period}
-                          </span>
-                        </div>
-                        <ul className="space-y-2">
-                          {exp.details.map((detail, j) => (
-                            <li
-                              key={j}
-                              className="text-lg text-white/60 leading-relaxed font-light flex items-center gap-2"
-                            >
-                              <span className="text-chocolate-accent font-black ">
-                                /
-                              </span>{" "}
-                              {detail}
-                            </li>
-                          ))}
-                        </ul>
-                      </motion.div>
-                    ))}
+                <div className="flex-1 overflow-y-auto p-8 md:p-12 md:px-20 no-scrollbar scroll-smooth">
+                  <div className="max-w-5xl mx-auto py-10 pb-40">
+                    {expandedType === "journey" ? (
+                      <div className="space-y-24">
+                        {experiences.map((exp, i) => (
+                          <motion.div
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: 0.1 + i * 0.05 }}
+                            key={i}
+                            className="border-l-2 border-chocolate-accent/20 pl-8 md:pl-12 relative"
+                          >
+                            <div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-chocolate-accent shadow-[0_0_15px_var(--color-chocolate-accent)]" />
+                            <div className="flex flex-col md:flex-row justify-between items-start mb-6 gap-4">
+                              <div>
+                                <p className="font-black text-3xl md:text-4xl text-white mb-2 tracking-tight">
+                                  {exp.company}
+                                </p>
+                                <p className="text-chocolate-accent text-lg font-bold font-tech uppercase tracking-widest">
+                                  {exp.role}
+                                </p>
+                              </div>
+                              <span className="px-4 py-2 bg-white/5 rounded-full text-xs font-black text-white/40 font-tech whitespace-nowrap">
+                                {exp.period}
+                              </span>
+                            </div>
+                            <ul className="space-y-4">
+                              {exp.details.map((detail, j) => (
+                                <li
+                                  key={j}
+                                  className="text-lg text-white/60 leading-relaxed font-light flex gap-4"
+                                >
+                                  <span className="text-chocolate-accent font-black mt-1">
+                                    /
+                                  </span>{" "}
+                                  {detail}
+                                </li>
+                              ))}
+                            </ul>
+                          </motion.div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-20 gap-y-12">
+                        {skills.map((skill, i) => (
+                          <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.1 + i * 0.05 }}
+                            key={skill.name}
+                            className="group"
+                          >
+                            <div className="flex justify-between items-end mb-4">
+                              <div>
+                                <p className="text-[10px] uppercase tracking-widest font-black text-white/20 mb-1 font-tech">
+                                  {skill.category}
+                                </p>
+                                <p className="text-2xl font-black text-white tracking-tight">
+                                  {skill.name}
+                                </p>
+                              </div>
+                              <p className="text-2xl font-black text-chocolate-accent font-tech">
+                                {skill.level}%
+                              </p>
+                            </div>
+                            <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
+                              <motion.div
+                                initial={{ width: 0 }}
+                                animate={{ width: `${skill.level}%` }}
+                                transition={{
+                                  duration: 1.5,
+                                  ease: "circOut",
+                                  delay: 0.5,
+                                }}
+                                className="h-full bg-gradient-to-r from-chocolate-accent/40 to-chocolate-accent shadow-[0_0_15px_var(--color-chocolate-accent)]"
+                              />
+                            </div>
+                          </motion.div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
               </motion.div>

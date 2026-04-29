@@ -38,8 +38,8 @@ const Navbar = () => {
       <div
         className={`max-w-7xl mx-auto rounded-full transition-all border-white/0 duration-500 flex items-center justify-between px-8 ${
           isScrolled
-            ? "bg-white/5 backdrop-blur-xl border border-white/5 py-3 "
-            : "bg-transparent py-0"
+            ? "bg-white/5 backdrop-blur-xl border border-white/1 py-3 "
+            : "bg-transparent py-3"
         }`}
       >
         <div className="flex-shrink-0">
