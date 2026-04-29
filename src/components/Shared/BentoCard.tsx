@@ -35,6 +35,8 @@ const BentoCard = ({
     glass: 'bg-white/5 backdrop-blur-2xl border-white/10 text-white'
   };
 
+  const hasPaddingOverride = className.includes('p-');
+
   return (
     <div
       className={`
@@ -42,7 +44,7 @@ const BentoCard = ({
         ${rowSpans[rowSpan] || ''} 
         ${themes[theme]}
         rounded-[32px] 
-        p-10 
+        ${hasPaddingOverride ? '' : 'p-10'} 
         border 
         overflow-hidden
         flex flex-col
