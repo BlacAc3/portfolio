@@ -40,7 +40,7 @@ const HeroSection = () => {
   return (
     <section ref={containerRef} className="scroll-section" id="home">
       <div className="sticky-container">
-        <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute inset-0">
           <motion.div 
             ref={meshRef}
             animate={{ 
@@ -62,31 +62,31 @@ const HeroSection = () => {
           <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
         </div>
 
-        <div ref={contentRef} className="max-w-7xl mx-auto mt-24 px-6 pt-32 pb-40 text-center z-10 w-full flex flex-col justify-center min-h-screen">
+        <div ref={contentRef} className="max-w-7xl mx-auto mt-52 md:mt-24  px-6 pt-20 md:pt-32 pb-40 text-center z-10 w-full flex flex-col justify-center min-h-[90vh]">
           <div className="relative mb-12">
             <div className="overflow-hidden">
-              <h1 ref={title1Ref} className="text-[12vw] lg:text-[120px] font-black leading-[0.8] tracking-[-0.06em] text-white">
+              <h1 ref={title1Ref} className="text-[clamp(3.5rem,12vw,120px)] font-black leading-[0.85] tracking-[-0.06em] text-white">
                 DESIGNING
               </h1>
             </div>
             <div className="mt-4">
-              <h1 ref={title2Ref} className="text-[12vw] lg:text-[120px] font-black leading-[0.8] tracking-[-0.06em] text-chocolate-accent">
+              <h1 ref={title2Ref} className="text-[clamp(3.5rem,12vw,120px)] font-black leading-[0.85] tracking-[-0.06em] text-chocolate-accent">
                 THE FUTURE
               </h1>
             </div>
           </div>
 
-          <div ref={introRef} className="max-w-4xl mx-auto mt-12">
-            <h2 className="text-xl md:text-2xl italic font-light text-white/60 tracking-tight leading-relaxed mb-16 text-balance">
-              "Hi, I'm <span className="text-white font-medium">Aaron Ezeala</span>. <br />
+          <div ref={introRef} className="max-w-4xl mx-auto mt-8 md:mt-12">
+            <h2 className="text-lg md:text-2xl italic font-light text-white/60 tracking-tight leading-relaxed mb-12 md:mb-16 text-balance">
+              "Hi, I'm <span className="text-white font-medium">Aaron Ezeala</span>. <br className="hidden sm:block" />
               I build high-fidelity digital interfaces and robust systems 
               that define the next generation of the web."
             </h2>
             
-            <div className="flex flex-col sm:flex-row pt-18 justify-center items-center gap-18">
+            <div className="flex flex-col sm:flex-row pt-8 md:pt-18 justify-center items-center gap-6 md:gap-18">
               <motion.a
                 href="#projects"
-                className="group relative px-12 py-5 bg-white text-black text-lg font-bold rounded-full overflow-hidden transition-all"
+                className="group relative w-full sm:w-auto px-12 py-5 bg-white text-black text-lg font-bold rounded-full overflow-hidden transition-all text-center"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -95,7 +95,7 @@ const HeroSection = () => {
               </motion.a>
               <motion.a
                 href="#contact"
-                className="px-12 py-5 border border-white/10 bg-white/5 backdrop-blur-md text-white text-lg font-bold rounded-full hover:bg-white/10 transition-all"
+                className="w-full sm:w-auto px-12 py-5 border border-white/10 bg-white/5 backdrop-blur-md text-white text-lg font-bold rounded-full hover:bg-white/10 transition-all text-center"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -105,7 +105,7 @@ const HeroSection = () => {
           </div>
         </div>
 
-        <div ref={indicatorRef} className="absolute bottom-10 left-1/2 -translate-x-1/2">
+        <div ref={indicatorRef} className="absolute bottom-10 left-1/2 -translate-x-1/2 hidden md:block">
           <div className="flex flex-col items-center gap-4">
             <p className="text-[10px] uppercase tracking-[0.5em] text-white/30 font-bold">Initiate</p>
             <div className="w-[1px] h-20 bg-gradient-to-b from-chocolate-accent to-transparent relative">

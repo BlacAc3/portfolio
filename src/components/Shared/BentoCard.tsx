@@ -44,7 +44,7 @@ const BentoCard = ({
         ${rowSpans[rowSpan] || ''} 
         ${themes[theme]}
         rounded-[32px] 
-        ${hasPaddingOverride ? '' : 'p-10'} 
+        ${hasPaddingOverride ? '' : 'px-6 py-10 md:px-10'} 
         border 
         overflow-hidden
         flex flex-col
