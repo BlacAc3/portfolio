@@ -26,6 +26,7 @@ const Home = () => {
           end: "+=100%",
           pin: true,
           scrub: 1,
+          anticipatePin: 1,
         },
       });
 
@@ -48,6 +49,7 @@ const Home = () => {
           end: "+=100%",
           pin: true,
           scrub: 1,
+          anticipatePin: 1,
         },
       });
 
@@ -218,7 +220,7 @@ const Home = () => {
         className="min-h-screen py-20 flex items-center justify-center relative overflow-hidden"
         ref={speedRef}
       >
-        <div ref={speedContentRef} className="max-w-5xl text-center px-6">
+        <div ref={speedContentRef} className="max-w-5xl text-center px-6 will-change-transform">
           <h3 className="text-[9px] md:text-[10px] uppercase tracking-[0.6em] text-chocolate-accent font-black mb-8 md:mb-10 font-tech">
             Philosophy of Speed
           </h3>
@@ -241,7 +243,7 @@ const Home = () => {
         className="min-h-screen py-20 flex items-center justify-center relative overflow-hidden"
         ref={craftRef}
       >
-        <div ref={craftContentRef} className="max-w-6xl text-center px-6">
+        <div ref={craftContentRef} className="max-w-6xl text-center px-6 will-change-transform">
           <h3 className="text-[9px] md:text-[10px] uppercase tracking-[0.6em] text-chocolate-accent font-black mb-12 md:mb-16 font-tech">
             The Craft
           </h3>
@@ -282,7 +284,7 @@ const Home = () => {
           </Link>
         </motion.div>
 
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] md:w-[800px] md:h-[800px] bg-chocolate-accent/15 blur-[80px] md:blur-[180px] rounded-full -z-10 pointer-events-none" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] md:w-[800px] md:h-[800px] bg-chocolate-accent/15 blur-[80px] md:blur-[180px] rounded-full -z-10 pointer-events-none will-change-[filter,transform]" />
       </section>
     </div>
   );

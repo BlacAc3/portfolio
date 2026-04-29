@@ -25,7 +25,6 @@
 body {
     font-family: var(--font-body);
     -webkit-font-smoothing: antialiased;
-    scroll-behavior: smooth;
     overflow-x: hidden;
     background-color: var(--color-chocolate-dark);
 }

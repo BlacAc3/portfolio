@@ -22,6 +22,7 @@ const HeroSection = () => {
           start: "top top",
           end: "bottom top",
           scrub: 1,
+          anticipatePin: 1,
         }
       });
 
@@ -52,17 +53,18 @@ const HeroSection = () => {
               repeat: Infinity, 
               ease: "linear" 
             }}
-            className="absolute top-[-20%] left-[-10%] w-[140%] h-[140%] opacity-20"
+            className="absolute top-[-20%] left-[-10%] w-[140%] h-[140%] opacity-20 will-change-transform"
             style={{
               background: `radial-gradient(circle at 50% 50%, var(--color-chocolate-accent) 0%, transparent 50%),
                            radial-gradient(circle at 20% 80%, #3a2e26 0%, transparent 40%),
                            radial-gradient(circle at 80% 20%, #1d1b1a 0%, transparent 40%)`
             }}
           />
-          <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
+          <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')] will-change-opacity" />
         </div>
 
-        <div ref={contentRef} className="max-w-7xl mx-auto mt-52 md:mt-52  px-6 pt-20 md:pt-20 pb-40 text-center z-10 w-full flex flex-col justify-center min-h-[90vh]">
+        <div ref={contentRef} className="max-w-7xl mx-auto mt-24 px-6 pt-20 md:pt-32 pb-40 text-center z-10 w-full flex flex-col justify-center min-h-[90vh] will-change-transform" >
+
           <div className="relative mb-12">
             <div className="overflow-hidden">
               <h1 ref={title1Ref} className="text-[clamp(3.5rem,12vw,120px)] font-black leading-[0.85] tracking-[-0.06em] text-white">
