@@ -62,7 +62,7 @@ const HeroSection = () => {
           <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
         </div>
 
-        <div ref={contentRef} className="max-w-7xl mx-auto mt-52 md:mt-24  px-6 pt-20 md:pt-32 pb-40 text-center z-10 w-full flex flex-col justify-center min-h-[90vh]">
+        <div ref={contentRef} className="max-w-7xl mx-auto mt-52 md:mt-52  px-6 pt-20 md:pt-20 pb-40 text-center z-10 w-full flex flex-col justify-center min-h-[90vh]">
           <div className="relative mb-12">
             <div className="overflow-hidden">
               <h1 ref={title1Ref} className="text-[clamp(3.5rem,12vw,120px)] font-black leading-[0.85] tracking-[-0.06em] text-white">
@@ -76,14 +76,14 @@ const HeroSection = () => {
             </div>
           </div>
 
-          <div ref={introRef} className="max-w-4xl mx-auto mt-8 md:mt-12">
-            <h2 className="text-lg md:text-2xl italic font-light text-white/60 tracking-tight leading-relaxed mb-12 md:mb-16 text-balance">
+          <div ref={introRef} className="max-w-4xl mx-auto mt-6 ">
+            <h2 className="text-lg md:text-2xl italic font-light text-white/60 tracking-tight leading-relaxed mb-12 md:mb-14 text-balance">
               "Hi, I'm <span className="text-white font-medium">Aaron Ezeala</span>. <br className="hidden sm:block" />
               I build high-fidelity digital interfaces and robust systems 
               that define the next generation of the web."
             </h2>
             
-            <div className="flex flex-col sm:flex-row pt-8 md:pt-18 justify-center items-center gap-6 md:gap-18">
+            <div className="flex flex-col sm:flex-row pt-8 md:pt-12 justify-center items-center gap-6 md:gap-18">
               <motion.a
                 href="#projects"
                 className="group relative w-full sm:w-auto px-12 py-5 bg-white text-black text-lg font-bold rounded-full overflow-hidden transition-all text-center"
