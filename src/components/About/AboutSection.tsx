@@ -32,32 +32,38 @@ interface SiteSettings {
 const AboutSection = () => {
   const [expandedType, setExpandedType] = useState<ExpandedType>(null);
 
-  const { data: sanityExperiences } = useSanity<Experience[]>(`*[_type == "experience"] | order(startDate desc)`);
-  const { data: sanitySkills } = useSanity<Skill[]>(`*[_type == "skill"] | order(proficiency desc)`);
-  const { data: settings } = useSanity<SiteSettings>(`*[_type == "siteSettings"][0]`);
+  const { data: sanityExperiences } = useSanity<Experience[]>(
+    `*[_type == "experience"] | order(startDate desc)`,
+  );
+  const { data: sanitySkills } = useSanity<Skill[]>(
+    `*[_type == "skill"] | order(proficiency desc)`,
+  );
+  const { data: settings } = useSanity<SiteSettings>(
+    `*[_type == "siteSettings"][0]`,
+  );
 
   const formatDate = (dateStr: string) => {
     if (!dateStr) return "";
     const date = new Date(dateStr);
-    return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    return date.toLocaleDateString("en-US", { month: "long", year: "numeric" });
   };
 
   const experiences = useMemo(() => {
     if (!sanityExperiences) return [];
-    return sanityExperiences.map(exp => ({
+    return sanityExperiences.map((exp) => ({
       company: exp.company,
       role: exp.jobTitle,
       period: `${formatDate(exp.startDate)} - ${exp.isCurrentRole ? "Present" : formatDate(exp.endDate || "")}`,
-      details: exp.responsibilities || []
+      details: exp.responsibilities || [],
     }));
   }, [sanityExperiences]);
 
   const skills = useMemo(() => {
     if (!sanitySkills) return [];
-    return sanitySkills.map(skill => ({
+    return sanitySkills.map((skill) => ({
       name: skill.name,
       level: skill.proficiency || 0,
-      category: skill.category || "Other"
+      category: skill.category || "Other",
     }));
   }, [sanitySkills]);
 
@@ -87,7 +93,7 @@ const AboutSection = () => {
                     Professional Journey
                   </h4>
                   <span className="text-[10px] font-black text-white/20 group-hover:text-chocolate-accent transition-colors uppercase tracking-widest font-tech">
-                    Explore
+                    click to expand
                   </span>
                 </div>
                 <div className="space-y-8">
@@ -107,7 +113,9 @@ const AboutSection = () => {
                     </div>
                   ))}
                   {experiences.length === 0 && (
-                     <p className="text-white/20 font-tech uppercase tracking-widest text-[10px]">No experience listed yet.</p>
+                    <p className="text-white/20 font-tech uppercase tracking-widest text-[10px]">
+                      No experience listed yet.
+                    </p>
                   )}
                 </div>
               </div>
@@ -127,7 +135,7 @@ const AboutSection = () => {
                     Toolkit
                   </h4>
                   <span className="text-xs sm:text-[8px] font-black opacity-40 group-hover:opacity-100 transition-opacity uppercase tracking-widest font-tech">
-                    Details
+                    click to expand
                   </span>
                 </div>
                 <div className="flex flex-wrap gap-2">
@@ -140,7 +148,9 @@ const AboutSection = () => {
                     </span>
                   ))}
                   {skills.length === 0 && (
-                     <p className="text-white/20 font-tech uppercase tracking-widest text-[10px]">Loading...</p>
+                    <p className="text-white/20 font-tech uppercase tracking-widest text-[10px]">
+                      Loading...
+                    </p>
                   )}
                 </div>
               </div>
@@ -294,7 +304,9 @@ const AboutSection = () => {
                             </motion.div>
                           ))}
                           {experiences.length === 0 && (
-                             <p className="text-white/40 text-center font-tech uppercase tracking-widest">No entries found in the archives.</p>
+                            <p className="text-white/40 text-center font-tech uppercase tracking-widest">
+                              No entries found in the archives.
+                            </p>
                           )}
                         </div>
                       ) : (
@@ -335,7 +347,9 @@ const AboutSection = () => {
                             </motion.div>
                           ))}
                           {skills.length === 0 && (
-                             <p className="text-white/40 text-center font-tech uppercase tracking-widest">Scanning technical arsenal...</p>
+                            <p className="text-white/40 text-center font-tech uppercase tracking-widest">
+                              Scanning technical arsenal...
+                            </p>
                           )}
                         </div>
                       )}
