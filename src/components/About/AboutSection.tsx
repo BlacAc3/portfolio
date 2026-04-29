@@ -1,113 +1,65 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import BentoGrid from "../Shared/BentoGrid";
 import BentoCard from "../Shared/BentoCard";
 import me from "../../assets/me.webp";
 import { FaGithub, FaLinkedin, FaTimes } from "react-icons/fa";
 import { NoiseTexture } from "../magicui/noise-texture";
+import { useSanity } from "../../hooks/useSanity";
 
 type ExpandedType = "journey" | "toolkit" | null;
+
+interface Experience {
+  company: string;
+  jobTitle: string;
+  startDate: string;
+  endDate?: string;
+  isCurrentRole?: boolean;
+  responsibilities?: string[];
+}
+
+interface Skill {
+  name: string;
+  proficiency: number;
+  category: string;
+}
+
+interface SiteSettings {
+  experience?: string;
+  projectsCompleted?: string;
+}
 
 const AboutSection = () => {
   const [expandedType, setExpandedType] = useState<ExpandedType>(null);
 
-  const skills = [
-    { name: "Golang", level: 90, category: "Backend" },
-    { name: "Python", level: 95, category: "Backend" },
-    { name: "Django", level: 92, category: "Backend" },
-    { name: "TypeScript", level: 88, category: "Frontend" },
-    { name: "React", level: 90, category: "Frontend" },
-    { name: "FastAPI", level: 85, category: "Backend" },
-    { name: "AWS", level: 80, category: "Infrastructure" },
-    { name: "Docker", level: 85, category: "Infrastructure" },
-    { name: "Kubernetes", level: 75, category: "Infrastructure" },
-    { name: "GraphQL", level: 82, category: "Backend" },
-    { name: "PostgreSQL", level: 90, category: "Database" },
-    { name: "Node.js", level: 85, category: "Backend" },
-  ];
+  const { data: sanityExperiences } = useSanity<Experience[]>(`*[_type == "experience"] | order(startDate desc)`);
+  const { data: sanitySkills } = useSanity<Skill[]>(`*[_type == "skill"] | order(proficiency desc)`);
+  const { data: settings } = useSanity<SiteSettings>(`*[_type == "siteSettings"][0]`);
 
-  const experiences = [
-    {
-      company: "Jaa Africa",
-      role: "Python Developer (Django)",
-      period: "April 2025 - Present",
-      details: [
-        "Architecting robust backend systems for financial ecosystems.",
-        "Optimizing database performance and implementing secure REST APIs.",
-        "Collaborating on high-fidelity user interfaces integrated with Django.",
-      ],
-    },
-    {
-      company: "Techivate",
-      role: "Backend Engineer",
-      period: "2023",
-      details: [
-        "Built and maintained scalable API services for client projects.",
-        "Streamlined deployment pipelines using Docker and CI/CD tools.",
-        "Integrated third-party payment gateways and notification systems.",
-      ],
-    },
-    {
-      company: "Freelance / Open Source",
-      role: "Software Engineer",
-      period: "2022 - Present",
-      details: [
-        "Developing custom compilers and specialized AI automation tools.",
-        "Contributing to various open-source Python and JavaScript projects.",
-        "Consulting for startups on infrastructure and backend architecture.",
-      ],
-    },
-    {
-      company: "Project Ace",
-      role: "Lead Compiler Architect",
-      period: "2022",
-      details: [
-        "Designed and implemented a custom programming language syntax.",
-        "Engineered efficient lexical analysis and parsing algorithms.",
-        "Managed memory allocation and bytecode generation processes.",
-      ],
-    },
-    {
-      company: "Smart Logic Systems",
-      role: "Backend Intern",
-      period: "2021",
-      details: [
-        "Assisted in the development of data processing microservices.",
-        "Wrote automated unit tests for core backend functionality.",
-        "Learned industry-standard DevOps practices and cloud deployments.",
-      ],
-    },
-    {
-      company: "Dev Community Lead",
-      role: "Technical Mentor",
-      period: "2021 - 2023",
-      details: [
-        "Led workshops on modern web architecture and performance.",
-        "Mentored junior developers on system design principles.",
-        "Curated technical content for a community of 500+ engineers.",
-      ],
-    },
-    {
-      company: "FinTech Solutions",
-      role: "Contract Engineer",
-      period: "2023",
-      details: [
-        "Implemented high-security ledger systems for payment tracking.",
-        "Integrated real-time currency conversion APIs with low latency.",
-        "Refactored legacy codebases to improve maintainability and speed.",
-      ],
-    },
-    {
-      company: "Nexus Labs",
-      role: "Systems Research",
-      period: "2024",
-      details: [
-        "Researched next-generation distributed systems and consensus protocols.",
-        "Built prototypes for decentralized data storage solutions.",
-        "Optimized networking layers for high-throughput data streams.",
-      ],
-    },
-  ];
+  const formatDate = (dateStr: string) => {
+    if (!dateStr) return "";
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  };
+
+  const experiences = useMemo(() => {
+    if (!sanityExperiences) return [];
+    return sanityExperiences.map(exp => ({
+      company: exp.company,
+      role: exp.jobTitle,
+      period: `${formatDate(exp.startDate)} - ${exp.isCurrentRole ? "Present" : formatDate(exp.endDate || "")}`,
+      details: exp.responsibilities || []
+    }));
+  }, [sanityExperiences]);
+
+  const skills = useMemo(() => {
+    if (!sanitySkills) return [];
+    return sanitySkills.map(skill => ({
+      name: skill.name,
+      level: skill.proficiency || 0,
+      category: skill.category || "Other"
+    }));
+  }, [sanitySkills]);
 
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
@@ -154,6 +106,9 @@ const AboutSection = () => {
                       </p>
                     </div>
                   ))}
+                  {experiences.length === 0 && (
+                     <p className="text-white/20 font-tech uppercase tracking-widest text-[10px]">No experience listed yet.</p>
+                  )}
                 </div>
               </div>
             </BentoCard>
@@ -184,6 +139,9 @@ const AboutSection = () => {
                       {skill.name}
                     </span>
                   ))}
+                  {skills.length === 0 && (
+                     <p className="text-white/20 font-tech uppercase tracking-widest text-[10px]">Loading...</p>
+                  )}
                 </div>
               </div>
             </BentoCard>
@@ -233,7 +191,7 @@ const AboutSection = () => {
             <div className="grid grid-cols-2 gap-8 h-full items-center">
               <div className="text-center border-r border-white/5">
                 <p className="text-5xl font-black text-chocolate-accent tracking-tighter font-tech">
-                  20+
+                  {settings?.projectsCompleted || "20+"}
                 </p>
                 <p className="text-[10px] uppercase tracking-widest font-bold opacity-30 mt-2 font-tech">
                   Projects Delivered
@@ -241,7 +199,7 @@ const AboutSection = () => {
               </div>
               <div className="text-center">
                 <p className="text-5xl font-black text-white tracking-tighter font-tech">
-                  3+
+                  {settings?.experience || "3+"}
                 </p>
                 <p className="text-[10px] uppercase tracking-widest font-bold opacity-30 mt-2 font-tech">
                   Years Experience
@@ -251,7 +209,7 @@ const AboutSection = () => {
           </BentoCard>
         </BentoGrid>
 
-        {/* MODAL ARCHITECTURE (Unchanged) */}
+        {/* MODAL ARCHITECTURE */}
         <AnimatePresence>
           {expandedType && (
             <>
@@ -335,6 +293,9 @@ const AboutSection = () => {
                               </ul>
                             </motion.div>
                           ))}
+                          {experiences.length === 0 && (
+                             <p className="text-white/40 text-center font-tech uppercase tracking-widest">No entries found in the archives.</p>
+                          )}
                         </div>
                       ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-20 gap-y-12">
@@ -373,6 +334,9 @@ const AboutSection = () => {
                               </div>
                             </motion.div>
                           ))}
+                          {skills.length === 0 && (
+                             <p className="text-white/40 text-center font-tech uppercase tracking-widest">Scanning technical arsenal...</p>
+                          )}
                         </div>
                       )}
                     </div>

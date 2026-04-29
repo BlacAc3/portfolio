@@ -8,14 +8,24 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import me from "../assets/me.webp";
 import { HiArrowRight } from "react-icons/hi2";
+import { useSanity } from "../hooks/useSanity";
 
 gsap.registerPlugin(ScrollTrigger);
+
+interface SiteSettings {
+  experience?: string;
+  projectsCompleted?: string;
+  happyClients?: string;
+  heroTagline?: string;
+}
 
 const Home = () => {
   const speedRef = useRef<HTMLDivElement>(null);
   const craftRef = useRef<HTMLDivElement>(null);
   const speedContentRef = useRef<HTMLDivElement>(null);
   const craftContentRef = useRef<HTMLDivElement>(null);
+
+  const { data: settings } = useSanity<SiteSettings>(`*[_type == "siteSettings"][0]`);
 
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
@@ -159,7 +169,7 @@ const Home = () => {
               <div className="grid grid-cols-2 gap-4 md:gap-6 h-full items-center">
                 <div className="border-r border-white/5 pr-4">
                   <p className="text-4xl md:text-5xl lg:text-7xl font-black text-chocolate-accent tracking-tighter font-tech">
-                    3+
+                    {settings?.experience || "3+"}
                   </p>
                   <p className="text-[9px] md:text-[10px] uppercase tracking-widest font-bold opacity-40 mt-1 md:mt-2 font-tech">
                     Years Exp.
@@ -167,7 +177,7 @@ const Home = () => {
                 </div>
                 <div>
                   <p className="text-4xl md:text-5xl lg:text-7xl font-black text-white tracking-tighter font-tech">
-                    20+
+                    {settings?.projectsCompleted || "20+"}
                   </p>
                   <p className="text-[9px] md:text-[10px] uppercase tracking-widest font-bold opacity-40 mt-1 md:mt-2 font-tech">
                     Projects

@@ -2,8 +2,13 @@ import { useRef, useLayoutEffect } from "react";
 import { motion } from "framer-motion";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useSanity } from "../../hooks/useSanity";
 
 gsap.registerPlugin(ScrollTrigger);
+
+interface SiteSettings {
+  heroTagline?: string;
+}
 
 const HeroSection = () => {
   const containerRef = useRef<HTMLElement>(null);
@@ -13,6 +18,8 @@ const HeroSection = () => {
   const introRef = useRef<HTMLDivElement>(null);
   const indicatorRef = useRef<HTMLDivElement>(null);
   const meshRef = useRef<HTMLDivElement>(null);
+
+  const { data: settings } = useSanity<SiteSettings>(`*[_type == "siteSettings"][0]`);
 
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
@@ -79,10 +86,16 @@ const HeroSection = () => {
           </div>
 
           <div ref={introRef} className="max-w-4xl mx-auto mt-6 ">
-            <h2 className="text-lg md:text-2xl italic font-light text-white/60 tracking-tight leading-relaxed mb-4 sm:mb-12 text-balance">
-              "Hi, I'm <span className="text-white font-medium">Aaron Ezeala</span>. <br className="hidden sm:block" />
-              I build high-fidelity digital interfaces and robust systems 
-              that define the next generation of the web."
+            <h2 className="text-lg md:text-2xl italic font-light text-white/60 tracking-tight leading-relaxed mb-4 sm:mb-12 text-balance whitespace-pre-line">
+              {settings?.heroTagline ? (
+                settings.heroTagline
+              ) : (
+                <>
+                  "Hi, I'm <span className="text-white font-medium">Aaron Ezeala</span>. <br className="hidden sm:block" />
+                  I build high-fidelity digital interfaces and robust systems 
+                  that define the next generation of the web."
+                </>
+              )}
             </h2>
             
             <div className="flex flex-col sm:flex-row pt-8 md:pt-12 justify-center items-center gap-6 md:gap-18">

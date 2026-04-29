@@ -1,82 +1,79 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { AnimatePresence } from "framer-motion";
 import BentoGrid from "../Shared/BentoGrid";
 import BentoCard from "../Shared/BentoCard";
-import zloanPic from "../../assets/zloan.webp";
-import jobApiPic from "../../assets/jobApi.webp";
-import primersGptPic from "../../assets/primersGPT.webp";
+import { useSanity } from "../../hooks/useSanity";
+import { urlFor } from "../../lib/sanity";
+import { PortableText } from "@portabletext/react";
+
+interface Project {
+  _id: string;
+  name: string;
+  description?: any;
+  mainImage?: any;
+  technologies?: string[];
+  category?: string;
+  projectLink?: string;
+  featured?: boolean;
+}
 
 const ProjectsSection = () => {
   const [activeFilter, setActiveFilter] = useState("all");
 
+  const { data: sanityProjects, loading } = useSanity<Project[]>(`*[_type == "project"] | order(_createdAt desc)`);
+
   const filterButtons = [
     { name: "All", filter: "all" },
-    { name: "Personal", filter: "personal" },
-    { name: "Freelance", filter: "freelance" },
-    { name: "Open Source", filter: "contributions" },
+    { name: "Web App", filter: "web-app" },
+    { name: "Mobile App", filter: "mobile-app" },
+    { name: "Residential", filter: "residential" },
+    { name: "Commercial", filter: "commercial" },
   ];
 
-  const projects = [
-    {
-      id: 1,
-      title: "SaaS Subscription API",
-      description: "A high-performance backend orchestration layer for multi-tenant SaaS platforms.",
-      image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1470&q=80",
-      category: "personal",
-      colSpan: 2,
-      rowSpan: 2,
-      theme: "glass" as const,
-      tech: ["FastAPI", "PostgreSQL", "Redis"]
-    },
-    {
-      id: 2,
-      title: "Zloan",
-      description: "Financial management & loan tracking ecosystem.",
-      image: zloanPic,
-      category: "personal",
-      colSpan: 2,
-      rowSpan: 1,
-      theme: "dark" as const,
-      tech: ["Django", "React"]
-    },
-    {
-      id: 3,
-      title: "PrimersGPT",
-      description: "AI-driven knowledge distillation platform.",
-      image: primersGptPic,
-      category: "freelance",
-      colSpan: 1,
-      rowSpan: 1,
-      theme: "accent" as const,
-      tech: ["React", "n8n", "OpenAI"]
-    },
-    {
-      id: 4,
-      title: "Job Management",
-      description: "Productivity tool for the modern job seeker.",
-      image: jobApiPic,
-      category: "personal",
-      colSpan: 1,
-      rowSpan: 1,
-      theme: "glass" as const,
-      tech: ["Node.js", "Express"]
-    },
-    {
-        id: 5,
-        title: "Ace Compiler",
-        description: "Custom programming language implementation.",
-        image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1470&q=80",
-        category: "personal",
-        colSpan: 4,
-        rowSpan: 1,
-        theme: "dark" as const,
-        tech: ["Python", "LLVM"]
-      },
-  ];
+  const projects = useMemo(() => {
+    if (!sanityProjects) return [];
+    
+    return sanityProjects.map((p, index) => {
+      // Logic for bento spans to keep it interesting
+      let colSpan = 1;
+      let rowSpan = 1;
+      
+      if (index % 5 === 0) {
+        colSpan = 2;
+        rowSpan = 2;
+      } else if (index % 5 === 1) {
+        colSpan = 2;
+        rowSpan = 1;
+      } else if (index % 5 === 4) {
+        colSpan = 4;
+        rowSpan = 1;
+      }
+
+      return {
+        id: p._id,
+        title: p.name,
+        description: p.description,
+        image: p.mainImage ? urlFor(p.mainImage).url() : "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1470&q=80",
+        category: p.category || "web-app",
+        colSpan,
+        rowSpan,
+        theme: (index % 3 === 0 ? "glass" : index % 3 === 1 ? "dark" : "accent") as "glass" | "dark" | "accent",
+        tech: p.technologies || []
+      };
+    });
+  }, [sanityProjects]);
 
   const filteredProjects = activeFilter === "all" 
     ? projects 
     : projects.filter(p => p.category === activeFilter);
+
+  if (loading && !sanityProjects) {
+    return <div className="py-20 text-center text-white/40 uppercase tracking-widest font-bold font-tech">Loading Masterpieces...</div>;
+  }
+
+  if (projects.length === 0 && !loading) {
+    return null; // Don't show section if no projects
+  }
 
   return (
     <section id="projects" className="py-20 px-4 sm:px-6 lg:px-8">
@@ -125,7 +122,15 @@ const ProjectsSection = () => {
                     ))}
                   </div>
                   <h3 className="text-3xl font-bold mb-2 group-hover:text-chocolate-accent transition-colors">{project.title}</h3>
-                  <p className="text-white/60 text-lg line-clamp-2">{project.description}</p>
+                  <div className="text-white/60 text-lg line-clamp-2">
+                    {typeof project.description === 'string' ? (
+                      project.description
+                    ) : project.description ? (
+                      <PortableText value={project.description} />
+                    ) : (
+                      "View project details"
+                    )}
+                  </div>
                 </div>
               </BentoCard>
             ))}
