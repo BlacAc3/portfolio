@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import me from "../public/me.webp";
+import me from "../assets/me.webp";
 import { HiArrowRight } from "react-icons/hi2";
 
 gsap.registerPlugin(ScrollTrigger);

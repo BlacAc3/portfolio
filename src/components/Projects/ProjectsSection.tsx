@@ -2,9 +2,9 @@ import { useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import BentoGrid from "../Shared/BentoGrid";
 import BentoCard from "../Shared/BentoCard";
-import zloanPic from "../../public/zloan.webp";
-import jobApiPic from "../../public/jobApi.webp";
-import primersGptPic from "../../public/primersGPT.webp";
+import zloanPic from "../../assets/zloan.webp";
+import jobApiPic from "../../assets/jobApi.webp";
+import primersGptPic from "../../assets/primersGPT.webp";
 
 const ProjectsSection = () => {
   const [activeFilter, setActiveFilter] = useState("all");

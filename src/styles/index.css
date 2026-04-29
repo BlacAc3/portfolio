@@ -2,18 +2,18 @@
 @import "tailwindcss";
 
 @theme {
-  --color-chocolate-dark: #0a0a0a;
-  --color-chocolate-medium: #1d1b1a;
-  --color-chocolate-light: #2a2625;
-  --color-chocolate-accent: #d4a76a;
-  --color-chocolate-light-accent: #e8d5b5;
-  
-  --font-display: "Bricolage Grotesque", sans-serif;
-  --font-body: "Plus Jakarta Sans", sans-serif;
-  --font-tech: "Space Grotesk", sans-serif;
-  
-  --radius-apple: 32px;
-  --gap-apple: 24px;
+    --color-chocolate-dark: #0a0a0a;
+    --color-chocolate-medium: #1d1b1a;
+    --color-chocolate-light: #2a2625;
+    --color-chocolate-accent: #d4a76a;
+    --color-chocolate-light-accent: #e8d5b5;
+
+    --font-display: "Bricolage Grotesque", sans-serif;
+    --font-body: "Plus Jakarta Sans", sans-serif;
+    --font-tech: "Space Grotesk", sans-serif;
+
+    --radius-apple: 32px;
+    --gap-apple: 24px;
 }
 
 :root {
@@ -29,7 +29,10 @@ body {
     background-color: var(--color-chocolate-dark);
 }
 
-h1, h2, h3, .font-display {
+h1,
+h2,
+h3,
+.font-display {
     font-family: var(--font-display);
 }
 
@@ -80,4 +83,114 @@ h1, h2, h3, .font-display {
 .no-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
+}
+
+.glistening-glass {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow:
+        0 4px 24px -1px rgba(0, 0, 0, 0.2),
+        inset 0 0 20px 0 rgba(255, 255, 255, 0.02);
+}
+@keyframes border-glisten {
+    0% {
+        background-position: 0% 50%;
+    }
+    100% {
+        background-position: 200% 50%;
+    }
+}
+
+.glistening-glass::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1.5px; /* Increased border thickness for more intensity */
+    background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.1) 0%,
+        rgba(255, 255, 255, 0.6) 25%,
+        rgba(255, 255, 255, 0.9) 50%,
+        rgba(255, 255, 255, 0.6) 75%,
+        rgba(255, 255, 255, 0.1) 100%
+    );
+    background-size: 200% 100%;
+    -webkit-mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    -webkit-mask-composite: xor;
+    pointer-events: none;
+    z-index: 1;
+    animation: border-glisten 3s linear infinite; /* Faster animation */
+    animation-play-state: running;
+    opacity: 0.3; /* Subtle base state */
+    transition: opacity 0.3s ease;
+}
+
+/*.glistening-glass:hover::before {
+    opacity: 1;
+}*/
+
+@keyframes top-edge-sweep {
+    0% {
+        transform: translateX(-150%);
+    }
+    100% {
+        transform: translateX(250%);
+    }
+}
+
+.glistening-glass::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        to right,
+        transparent,
+        rgba(255, 255, 255, 0.1),
+        rgba(255, 255, 255, 0.3),
+        rgba(255, 255, 255, 0.1),
+        transparent
+    );
+    transform: skewX(-20deg) translateX(-150%);
+    pointer-events: none;
+    z-index: 2;
+    transition: none; /* Reset instantly when not hovered */
+}
+
+.glistening-glass:hover::after {
+    transform: skewX(-20deg) translateX(250%);
+    transition: transform 0.8s ease-in-out; /* Only animate on hover */
+}
+
+.glistening-glass-top-edge {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 50%;
+    height: 1px;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.8),
+        transparent
+    );
+    z-index: 3;
+    filter: blur(0.5px);
+    transform: translateX(-150%);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.glistening-glass:hover .glistening-glass-top-edge {
+    opacity: 1;
+    animation: top-edge-sweep 3s ease-in-out infinite;
 }

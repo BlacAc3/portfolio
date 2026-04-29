@@ -33,7 +33,7 @@ const BentoCard = ({
     light: "bg-white text-black border-black/5",
     accent:
       "bg-chocolate-accent text-chocolate-dark border-chocolate-accent/20",
-    glass: "bg-white/[0.04] backdrop-blur-[4px] border-white/15 text-white",
+    glass: "glistening-glass text-white border-0",
   };
 
   const hasPaddingOverride = className.includes("p-");
@@ -46,7 +46,7 @@ const BentoCard = ({
         ${themes[theme]}
         rounded-[32px]
         ${hasPaddingOverride ? "" : "px-6 py-10 md:px-10"}
-        border
+        ${theme !== "glass" ? "border" : ""}
         overflow-hidden
         flex flex-col
         justify-between
@@ -54,6 +54,7 @@ const BentoCard = ({
         ${className}
       `}
     >
+      {theme === "glass" && <div className="glistening-glass-top-edge" />}
       {children}
     </div>
   );

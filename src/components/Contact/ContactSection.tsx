@@ -4,8 +4,9 @@ import {
   FaGithub,
   FaLinkedin,
   FaTwitter,
+  FaWhatsapp,
 } from "react-icons/fa";
-import { MdEmail, MdPhone, MdLocationOn } from "react-icons/md";
+import { MdEmail, MdLocationOn } from "react-icons/md";
 
 type SubmitStatus = "success" | "error" | null;
 
@@ -145,14 +146,16 @@ const ContactSection = () => {
                 whileHover={{ x: 5 }}
               >
                 <div className="flex-shrink-0 pt-1">
-                  <MdPhone className="text-chocolate-accent text-xl" />
+                  <FaWhatsapp className="text-chocolate-accent text-xl" />
                 </div>
                 <div className="ml-4">
                   <h4 className="text-lg font-medium text-white">
-                    Phone
+                    WhatsApp
                   </h4>
                   <a
-                    href="tel:+2348059128741"
+                    href="https://wa.me/2348059128741"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="text-white/60 hover:text-chocolate-accent transition"
                   >
                     +234 (805) 912-8741
