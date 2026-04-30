@@ -1,4 +1,4 @@
-import { useState, ChangeEvent, FormEvent } from "react";
+import { useState, ChangeEvent, FormEvent, useRef } from "react";
 import { motion } from "framer-motion";
 import {
   FaGithub,
@@ -7,13 +7,15 @@ import {
   FaWhatsapp,
 } from "react-icons/fa";
 import { MdEmail, MdLocationOn } from "react-icons/md";
+import emailjs from "@emailjs/browser";
 
 type SubmitStatus = "success" | "error" | null;
 
 const ContactSection = () => {
+  const formRef = useRef<HTMLFormElement>(null);
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
+    from_name: "",
+    reply_to: "",
     subject: "",
     message: "",
   });
@@ -30,34 +32,29 @@ const ContactSection = () => {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    if (!formRef.current) return;
+    
     setIsSubmitting(true);
+    setSubmitStatus(null);
 
     try {
-      const response = await fetch(
-        "https://n8n-service-sfwl.onrender.com/webhook/7686876b-52a8-42fb-9a1d-dcd9cdcd5d66",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formData),
-        },
+      await emailjs.sendForm(
+        import.meta.env.VITE_EMAILJS_SERVICE_ID,
+        import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
+        formRef.current,
+        import.meta.env.VITE_EMAILJS_PUBLIC_KEY
       );
 
-      if (response.ok) {
-        setSubmitStatus("success");
-        setFormData({
-          name: "",
-          email: "",
-          subject: "",
-          message: "",
-        });
-      } else {
-        setSubmitStatus("error");
-      }
+      setSubmitStatus("success");
+      setFormData({
+        from_name: "",
+        reply_to: "",
+        subject: "",
+        message: "",
+      });
     } catch (error) {
       setSubmitStatus("error");
-      console.error("Form submission error:", error);
+      console.error("EmailJS Error:", error);
     } finally {
       setIsSubmitting(false);
     }
@@ -203,33 +200,34 @@ const ContactSection = () => {
 
           <motion.div className="lg:w-1/2" variants={itemVariants}>
             <motion.form
+              ref={formRef}
               onSubmit={handleSubmit}
               className="space-y-6"
             >
               {submitStatus === "success" && (
-                <div className="p-4 bg-green-100 text-green-800 rounded-lg mb-4">
-                  Your message has been sent successfully!
+                <div className="p-4 bg-green-500/10 text-green-500 border border-green-500/20 rounded-lg mb-4">
+                  Your message has been sent successfully, sir.
                 </div>
               )}
 
               {submitStatus === "error" && (
-                <div className="p-4 bg-red-100 text-red-800 rounded-lg mb-4">
+                <div className="p-4 bg-red-500/10 text-red-500 border border-red-500/20 rounded-lg mb-4">
                   There was an error sending your message. Please try again.
                 </div>
               )}
 
               <motion.div variants={formItemVariants}>
                 <label
-                  htmlFor="name"
+                  htmlFor="from_name"
                   className="block text-sm font-medium text-white/60 mb-1"
                 >
                   Your Name
                 </label>
                 <motion.input
                   type="text"
-                  id="name"
-                  name="name"
-                  value={formData.name}
+                  id="from_name"
+                  name="from_name"
+                  value={formData.from_name}
                   onChange={handleChange}
                   className="w-full px-4 py-3 rounded-lg focus:ring-2 focus:ring-chocolate-accent outline-none bg-white/5 text-white border border-white/10"
                   placeholder="John Doe"
@@ -240,16 +238,16 @@ const ContactSection = () => {
 
               <motion.div variants={formItemVariants}>
                 <label
-                  htmlFor="email"
+                  htmlFor="reply_to"
                   className="block text-sm font-medium text-white/60 mb-1"
                 >
                   Email Address
                 </label>
                 <motion.input
                   type="email"
-                  id="email"
-                  name="email"
-                  value={formData.email}
+                  id="reply_to"
+                  name="reply_to"
+                  value={formData.reply_to}
                   onChange={handleChange}
                   className="w-full px-4 py-3 rounded-lg focus:ring-2 focus:ring-chocolate-accent outline-none bg-white/5 text-white border border-white/10"
                   placeholder="john@example.com"
