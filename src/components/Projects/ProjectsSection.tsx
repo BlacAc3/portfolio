@@ -1,4 +1,5 @@
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { useRef } from "react";
 
 const projectsData = [
   {
@@ -44,21 +45,39 @@ const projectsData = [
 ];
 
 const ProjectsSection = () => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start center", "end center"]
+  });
+
+  const scaleY = useTransform(scrollYProgress, [0, 1], [0, 1]);
+
   return (
     <section id="projects" className="py-20 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-4xl mx-auto">
-        <div className="relative border-l border-white/20 ml-4 md:ml-8 space-y-16">
-          {projectsData.map((project, index) => (
+      <div className="max-w-4xl mx-auto" ref={containerRef}>
+        <div className="relative ml-4 md:ml-8 space-y-16">
+          {/* Base border line (dim) */}
+          <div className="absolute left-0 top-0 bottom-0 w-[1px] bg-white/10" />
+          
+          {/* Animated active line */}
+          <motion.div 
+            className="absolute left-0 top-0 bottom-0 w-[2px] bg-chocolate-accent shadow-[0_0_15px_var(--color-chocolate-accent)] origin-top z-0" 
+            style={{ scaleY }}
+          />
+
+          {projectsData.map((project) => (
             <motion.div 
               key={project.id}
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.6, delay: index * 0.1 }}
-              className="relative pl-8 md:pl-16 group"
+              initial={{ opacity: 0.3, x: -20, scale: 0.95 }}
+              whileInView={{ opacity: 1, x: 0, scale: 1 }}
+              viewport={{ once: false, margin: "-200px 0px" }}
+              transition={{ duration: 0.6 }}
+              className="relative pl-8 md:pl-16 group z-10"
             >
               {/* Timeline dot */}
-              <div className="absolute -left-[9px] top-2 w-4 h-4 rounded-full bg-chocolate-dark border-2 border-chocolate-accent group-hover:bg-chocolate-accent group-hover:shadow-[0_0_15px_var(--color-chocolate-accent)] transition-all duration-300" />
+              <div className="absolute -left-[9px] top-2 w-4 h-4 rounded-full bg-chocolate-dark border-2 border-chocolate-accent group-hover:bg-chocolate-accent group-hover:shadow-[0_0_15px_var(--color-chocolate-accent)] transition-all duration-300 z-10" />
               
               <div className="flex flex-col md:flex-row md:items-baseline gap-2 md:gap-4 mb-4">
                 <h3 className="text-2xl md:text-4xl font-black text-white group-hover:text-chocolate-accent transition-colors">

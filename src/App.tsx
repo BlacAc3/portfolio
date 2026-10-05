@@ -22,8 +22,11 @@ const PageTransition = ({ children }: { children: React.ReactNode }) => (
   </motion.div>
 );
 
+import { useLenisSetup } from "./hooks/useLenisSetup";
+
 const App = () => {
   const location = useLocation();
+  useLenisSetup();
 
   return (
     <div className="app relative min-h-screen">

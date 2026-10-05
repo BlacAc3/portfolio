@@ -1,12 +1,20 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { RiMenu4Line, RiCloseLine } from "react-icons/ri";
+
+const navLinks = [
+  { name: "Home", href: "/" },
+  { name: "Work", href: "/work" },
+  { name: "About", href: "/about" },
+  { name: "Contact", href: "/contact" },
+];
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -17,18 +25,44 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Vim motions for navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (
+        document.activeElement?.tagName === "INPUT" ||
+        document.activeElement?.tagName === "TEXTAREA"
+      ) {
+        return;
+      }
+
+      if (e.key === "h" || e.key === "l") {
+        const currentIndex = navLinks.findIndex(
+          (link) => link.href === location.pathname
+        );
+
+        // Default to Home if current route is not in navLinks
+        const validIndex = currentIndex === -1 ? 0 : currentIndex;
+
+        if (e.key === "h") {
+          const prevIndex = (validIndex - 1 + navLinks.length) % navLinks.length;
+          navigate(navLinks[prevIndex].href);
+        } else if (e.key === "l") {
+          const nextIndex = (validIndex + 1) % navLinks.length;
+          navigate(navLinks[nextIndex].href);
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [location.pathname, navigate]);
+
   // Ensure scroll to top on route change and close mobile menu
   useEffect(() => {
     window.scrollTo(0, 0);
     setIsMobileMenuOpen(false);
   }, [location.pathname]);
 
-  const navLinks = [
-    { name: "Home", href: "/" },
-    { name: "Work", href: "/work" },
-    { name: "About", href: "/about" },
-    { name: "Contact", href: "/contact" },
-  ];
 
   return (
     <>
