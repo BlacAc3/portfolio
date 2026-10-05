@@ -5,67 +5,49 @@ import BentoCard from "../Shared/BentoCard";
 import me from "../../assets/me.webp";
 import { FaGithub, FaLinkedin, FaTimes } from "react-icons/fa";
 import { NoiseTexture } from "../magicui/noise-texture";
-import { useSanity } from "../../hooks/useSanity";
 
 type ExpandedType = "journey" | "toolkit" | null;
-
-interface Experience {
-  company: string;
-  jobTitle: string;
-  startDate: string;
-  endDate?: string;
-  isCurrentRole?: boolean;
-  responsibilities?: string[];
-}
-
-interface Skill {
-  name: string;
-  proficiency: number;
-  category: string;
-}
-
-interface SiteSettings {
-  experience?: string;
-  projectsCompleted?: string;
-}
 
 const AboutSection = () => {
   const [expandedType, setExpandedType] = useState<ExpandedType>(null);
 
-  const { data: sanityExperiences } = useSanity<Experience[]>(
-    `*[_type == "experience"] | order(startDate desc)`,
-  );
-  const { data: sanitySkills } = useSanity<Skill[]>(
-    `*[_type == "skill"] | order(proficiency desc)`,
-  );
-  const { data: settings } = useSanity<SiteSettings>(
-    `*[_type == "siteSettings"][0]`,
-  );
+  const experiences = useMemo(() => [
+    {
+      company: "IYF Studios",
+      role: "Full Stack Engineer",
+      period: "August 2025 - June 2026",
+      details: [
+        "Architected the backend and spearheaded frontend integration for a comprehensive gamified EMS using Django and React.",
+        "Designed a complex relational database schema mapping intricate many-to-many relationships between students, teachers, parents, courses, assessments and a lot more.",
+        "Implemented strict Service-Repository architectural patterns to ensure the codebase remained scalable and maintainable."
+      ],
+    },
+    {
+      company: "Heckerbella",
+      role: "Backend Engineer",
+      period: "August 2024 - March 2026",
+      details: [
+        "Engineered a secure, highly scalable membership platform using Django with strict Role-Based Access Control (RBAC).",
+        "Designed a multi-tenant backend utilizing Django and PostgreSQL for a Job/Recruitment Platform.",
+        "Engineered a highly concurrent job queue system using Celery and Redis for asynchronous processing.",
+        "Integrated sub-millisecond full-text search capabilities and strictly segregated recruiter/candidate data streams."
+      ],
+    }
+  ], []);
 
-  const formatDate = (dateStr: string) => {
-    if (!dateStr) return "";
-    const date = new Date(dateStr);
-    return date.toLocaleDateString("en-US", { month: "long", year: "numeric" });
-  };
+  const skills = useMemo(() => [
+    { name: "Node.js", level: 95, category: "Core Backend" },
+    { name: "Python", level: 95, category: "Core Backend" },
+    { name: "Go", level: 85, category: "Core Backend" },
+    { name: "React", level: 90, category: "Frontend Integration" },
+    { name: "Microservices", level: 90, category: "Architecture & Design" },
+    { name: "PostgreSQL", level: 90, category: "Data & Storage" },
+    { name: "Redis", level: 85, category: "Data & Storage" },
+    { name: "Linux", level: 95, category: "Infrastructure" },
+    { name: "Docker", level: 90, category: "Infrastructure" }
+  ], []);
 
-  const experiences = useMemo(() => {
-    if (!sanityExperiences) return [];
-    return sanityExperiences.map((exp) => ({
-      company: exp.company,
-      role: exp.jobTitle,
-      period: `${formatDate(exp.startDate)} - ${exp.isCurrentRole ? "Present" : formatDate(exp.endDate || "")}`,
-      details: exp.responsibilities || [],
-    }));
-  }, [sanityExperiences]);
-
-  const skills = useMemo(() => {
-    if (!sanitySkills) return [];
-    return sanitySkills.map((skill) => ({
-      name: skill.name,
-      level: skill.proficiency || 0,
-      category: skill.category || "Other",
-    }));
-  }, [sanitySkills]);
+  const settings = { projectsCompleted: "20+", experience: "4+" };
 
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
