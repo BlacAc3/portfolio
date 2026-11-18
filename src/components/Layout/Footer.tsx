@@ -11,16 +11,16 @@ const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="relative z-10 border-t border-white/10 px-4 py-10 sm:px-6 lg:px-8">
+    <footer className="relative z-10 border-t border-ink/10 px-4 py-10 sm:px-6 lg:px-8">
       <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-6 md:flex-row">
         <div className="text-center md:text-left">
           <Link
             to="/"
-            className="font-display text-xl font-bold tracking-tight text-white transition-colors hover:text-chocolate-accent"
+            className="font-display text-xl font-bold tracking-tight text-ink transition-colors hover:text-accent"
           >
-            Blacac3<span className="text-chocolate-accent">.</span>
+            Blacac3<span className="text-accent">.</span>
           </Link>
-          <p className="mt-1 text-sm text-white/60">
+          <p className="mt-1 text-sm text-ink/60">
             © {currentYear} Aaron Ezeala. Designed &amp; engineered in-house.
           </p>
         </div>
@@ -33,7 +33,7 @@ const Footer = () => {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={`${label} (opens in a new tab)`}
-                className="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 text-white/70 transition-[color,border-color,transform] duration-300 hover:-translate-y-0.5 hover:border-chocolate-accent/50 hover:text-chocolate-accent"
+                className="flex h-11 w-11 items-center justify-center rounded-full border border-ink/10 text-ink/70 transition-[color,border-color,transform] duration-300 hover:-translate-y-0.5 hover:border-accent/50 hover:text-accent"
               >
                 <Icon className="text-lg" aria-hidden="true" />
               </a>

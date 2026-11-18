@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { jumpTo } from "../../lib/jump";
 import { RiMenu4Line, RiCloseLine } from "react-icons/ri";
+import ThemeToggle from "./ThemeToggle";
 
 const navLinks = [
   { name: "Home", href: "/" },
@@ -94,7 +95,7 @@ const Navbar = () => {
     <>
       <a
         href="#main-content"
-        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[200] focus:px-5 focus:py-3 focus:rounded-full focus:bg-chocolate-accent focus:text-chocolate-dark focus:font-bold focus:text-sm"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[200] focus:px-5 focus:py-3 focus:rounded-full focus:bg-accent focus:text-canvas focus:font-bold focus:text-sm"
       >
         Skip to content
       </a>
@@ -111,14 +112,14 @@ const Navbar = () => {
             with the nav in the gap above it. */}
         <div
           aria-hidden="true"
-          className={`pointer-events-none absolute inset-x-0 top-0 -z-10 h-[150%] bg-gradient-to-b from-chocolate-dark via-chocolate-dark/75 to-transparent transition-opacity duration-500 ${
+          className={`pointer-events-none absolute inset-x-0 top-0 -z-10 h-[150%] bg-gradient-to-b from-canvas via-canvas/75 to-transparent transition-opacity duration-500 ${
             isScrolled ? "opacity-100" : "opacity-0"
           }`}
         />
         <div
           className={`max-w-7xl mx-auto rounded-full transition-all duration-500 flex items-center justify-between px-6 md:px-8 py-3 border ${
             isScrolled
-              ? "bg-chocolate-dark/60 backdrop-blur-xl border-white/10"
+              ? "bg-canvas/60 backdrop-blur-xl border-ink/10"
               : "bg-transparent border-transparent"
           }`}
         >
@@ -126,13 +127,13 @@ const Navbar = () => {
             to="/"
             aria-label="Blacac3 — home"
             onClick={homeJump("/")}
-            className="text-xl md:text-2xl font-black tracking-tighter text-white hover:text-chocolate-accent transition-colors"
+            className="text-xl md:text-2xl font-black tracking-tighter text-ink hover:text-accent transition-colors"
           >
-            Blacac3<span className="text-chocolate-accent">.</span>
+            Blacac3<span className="text-accent">.</span>
           </Link>
 
           {/* Desktop links */}
-          <div className="hidden md:flex items-center gap-8 lg:gap-12">
+          <div className="hidden md:flex items-center gap-6 lg:gap-10">
             <ul className="flex items-center gap-8 lg:gap-12">
               {navLinks.map((link) => {
                 const active = location.pathname === link.href;
@@ -144,14 +145,14 @@ const Navbar = () => {
                       onClick={homeJump(link.href)}
                       className={`text-[11px] lg:text-xs uppercase tracking-[0.2em] font-bold transition-colors relative group py-2 ${
                         active
-                          ? "text-chocolate-accent"
-                          : "text-white/70 hover:text-white"
+                          ? "text-accent"
+                          : "text-ink/70 hover:text-ink"
                       }`}
                     >
                       {link.name}
                       <span
                         aria-hidden="true"
-                        className={`absolute bottom-0 left-0 h-[2px] bg-chocolate-accent transition-all duration-300 ${
+                        className={`absolute bottom-0 left-0 h-[2px] bg-accent transition-all duration-300 ${
                           active ? "w-full" : "w-0 group-hover:w-full"
                         }`}
                       />
@@ -161,19 +162,23 @@ const Navbar = () => {
               })}
             </ul>
 
+            <ThemeToggle />
+
             <Link
               to="/contact"
-              className="px-6 py-2.5 bg-white text-chocolate-dark rounded-full text-xs uppercase tracking-widest font-black hover:bg-chocolate-accent transition-colors"
+              className="px-6 py-2.5 bg-ink text-canvas rounded-full text-xs uppercase tracking-widest font-black hover:bg-accent transition-colors"
             >
               Hire Me
             </Link>
           </div>
 
-          {/* Mobile menu toggle — 44px touch target */}
+          {/* Mobile: theme switch + menu toggle — 44px touch targets */}
+          <div className="flex items-center gap-2 md:hidden">
+          <ThemeToggle />
           <button
             type="button"
             onClick={() => setIsMobileMenuOpen((open) => !open)}
-            className="md:hidden -mr-2 w-11 h-11 flex items-center justify-center text-white"
+            className="-mr-2 w-11 h-11 flex items-center justify-center text-ink"
             aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
             aria-expanded={isMobileMenuOpen}
             aria-controls={MOBILE_MENU_ID}
@@ -184,6 +189,7 @@ const Navbar = () => {
               <RiMenu4Line size={28} aria-hidden="true" />
             )}
           </button>
+          </div>
         </div>
       </motion.nav>
 
@@ -196,7 +202,7 @@ const Navbar = () => {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: "100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="fixed inset-0 z-40 bg-chocolate-dark md:hidden flex flex-col items-center justify-center"
+            className="fixed inset-0 z-40 bg-canvas md:hidden flex flex-col items-center justify-center"
           >
             <ul className="flex flex-col items-center gap-8">
               {navLinks.map((link) => {
@@ -209,8 +215,8 @@ const Navbar = () => {
                       onClick={homeJump(link.href)}
                       className={`text-4xl font-black uppercase tracking-tighter transition-colors ${
                         active
-                          ? "text-chocolate-accent"
-                          : "text-white/75 hover:text-white"
+                          ? "text-accent"
+                          : "text-ink/75 hover:text-ink"
                       }`}
                     >
                       {link.name}
@@ -221,7 +227,7 @@ const Navbar = () => {
               <li>
                 <Link
                   to="/contact"
-                  className="mt-6 inline-block px-10 py-4 bg-white text-chocolate-dark rounded-full text-sm uppercase tracking-widest font-black"
+                  className="mt-6 inline-block px-10 py-4 bg-ink text-canvas rounded-full text-sm uppercase tracking-widest font-black"
                 >
                   Hire Me
                 </Link>
@@ -230,7 +236,7 @@ const Navbar = () => {
 
             <div
               aria-hidden="true"
-              className="absolute bottom-12 left-0 w-full px-8 flex justify-between items-end text-white/40"
+              className="absolute bottom-12 left-0 w-full px-8 flex justify-between items-end text-ink/40"
             >
               <p className="text-[11px] font-black uppercase tracking-[0.5em]">
                 Blacac3 Portfolio

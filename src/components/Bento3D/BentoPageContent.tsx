@@ -29,10 +29,10 @@ const pad = (n: number) => String(n).padStart(2, "0");
  * Glass is faked with a sheen overlay on a solid base instead.
  */
 const surface: Record<BentoCell["theme"], string> = {
-  glass: "bg-chocolate-medium text-white",
-  dark: "bg-chocolate-dark text-white",
-  accent: "bg-chocolate-accent text-chocolate-dark",
-  photo: "bg-chocolate-light text-white",
+  glass: "bg-surface text-ink",
+  dark: "bg-canvas text-ink",
+  accent: "bg-accent text-canvas",
+  photo: "bg-raised text-ink",
 };
 
 const BentoPageContent = ({
@@ -54,31 +54,31 @@ const BentoPageContent = ({
       : stat,
   );
 
-  const muted = bright ? "text-chocolate-dark/70" : "text-white/60";
-  const body = bright ? "text-chocolate-dark/80" : "text-white/70";
-  const hairline = bright ? "bg-chocolate-dark/20" : "bg-white/15";
+  const muted = bright ? "text-canvas/70" : "text-ink/60";
+  const body = bright ? "text-canvas/80" : "text-ink/70";
+  const hairline = bright ? "bg-canvas/20" : "bg-ink/15";
   const chip = bright
-    ? "border-chocolate-dark/25 text-chocolate-dark/80"
-    : "border-white/15 text-white/70";
+    ? "border-canvas/25 text-canvas/80"
+    : "border-ink/15 text-ink/70";
 
   const portrait = (
     <button
       type="button"
       onClick={onExpandImage}
-      className="group relative mx-auto block aspect-[4/5] w-full max-w-[26rem] overflow-hidden rounded-[28px] border border-white/10 bg-black/40 md:max-w-none"
+      className="group relative mx-auto block aspect-[4/5] w-full max-w-[26rem] overflow-hidden rounded-[28px] border border-ink/10 bg-black/40 md:max-w-none"
       aria-label="View full photo of Aaron"
     >
       <img
         src={me}
         alt="Aaron Ezeala"
         loading="lazy"
-        className="absolute inset-0 h-full w-full object-cover object-[center_30%] grayscale transition duration-700 group-hover:scale-[1.03] group-hover:grayscale-0"
+        className="absolute inset-0 h-full w-full object-cover object-[center_30%] transition-transform duration-700 group-hover:scale-[1.03]"
       />
       <span aria-hidden className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
-      <span aria-hidden className="pointer-events-none absolute inset-3 rounded-[20px] border border-chocolate-accent/25" />
+      <span aria-hidden className="pointer-events-none absolute inset-3 rounded-[20px] border border-accent/25" />
       <span className="absolute bottom-5 left-5 flex items-center gap-3 rounded-full bg-black/40 px-4 py-2 backdrop-blur-md">
-        <span className="h-1.5 w-1.5 rounded-full bg-chocolate-accent" />
-        <span className="font-tech text-[10px] font-bold uppercase tracking-[0.3em] text-white/85">
+        <span className="h-1.5 w-1.5 rounded-full bg-accent" />
+        <span className="font-tech text-[10px] font-bold uppercase tracking-[0.3em] text-ink/85">
           View photo
         </span>
       </span>
@@ -93,12 +93,12 @@ const BentoPageContent = ({
         <>
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-0 bg-[linear-gradient(165deg,rgba(255,255,255,0.06),rgba(255,255,255,0.015)_38%,rgba(255,255,255,0)_64%)]"
+            className="pointer-events-none absolute inset-0 bg-[linear-gradient(165deg,rgb(var(--ink-rgb)/0.06),rgb(var(--ink-rgb)/0.015)_38%,rgb(var(--ink-rgb)/0)_64%)]"
           />
           <div aria-hidden className="glistening-glass-top-edge" />
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/25 to-transparent"
+            className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-ink/25 to-transparent"
           />
         </>
       )}
@@ -107,7 +107,7 @@ const BentoPageContent = ({
       <div
         aria-hidden
         className={`pointer-events-none absolute -top-40 left-1/2 h-[520px] w-[520px] -translate-x-1/2 rounded-full blur-[120px] ${
-          bright ? "bg-white/30" : "bg-chocolate-accent/10"
+          bright ? "bg-ink/30" : "bg-accent/10"
         }`}
       />
 
@@ -123,7 +123,7 @@ const BentoPageContent = ({
             </span>
             <span className={`h-px flex-1 ${hairline}`} />
             <span
-              className={`font-tech text-[11px] font-bold uppercase tracking-[0.4em] ${bright ? "text-chocolate-dark/70" : "text-chocolate-accent"}`}
+              className={`font-tech text-[11px] font-bold uppercase tracking-[0.4em] ${bright ? "text-canvas/70" : "text-accent"}`}
             >
               {cell.eyebrow}
             </span>
@@ -141,9 +141,9 @@ const BentoPageContent = ({
                   {page.lead}
                 </p>
                 <div className="mt-10 md:hidden">{portrait}</div>
-                <ol className="mt-12 list-none border-t border-white/10 p-0 md:mt-auto md:pt-2">
+                <ol className="mt-12 list-none border-t border-ink/10 p-0 md:mt-auto md:pt-2">
                   {page.points.map((point, i) => (
-                    <li key={point.title} className="grid grid-cols-[2.25rem_1fr] gap-x-3 border-b border-white/10 py-6 md:py-7">
+                    <li key={point.title} className="grid grid-cols-[2.25rem_1fr] gap-x-3 border-b border-ink/10 py-6 md:py-7">
                       <span className={`pt-1.5 font-tech text-[10px] font-bold tracking-[0.3em] ${muted}`}>
                         {pad(i + 1)}
                       </span>
@@ -183,7 +183,7 @@ const BentoPageContent = ({
           {/* Points */}
           <div
             className={`mt-14 grid gap-9 border-t pt-9 md:mt-20 md:grid-cols-3 md:gap-10 ${
-              bright ? "border-chocolate-dark/20" : "border-white/10"
+              bright ? "border-canvas/20" : "border-ink/10"
             }`}
           >
             {page.points.map((point, i) => (
@@ -192,7 +192,7 @@ const BentoPageContent = ({
                 className={
                   i > 0
                     ? `md:border-l md:pl-10 ${
-                        bright ? "border-chocolate-dark/20" : "border-white/10"
+                        bright ? "border-canvas/20" : "border-ink/10"
                       }`
                     : ""
                 }
@@ -223,7 +223,7 @@ const BentoPageContent = ({
           {stats && stats.length > 0 && (
             <div
               className={`mt-14 grid gap-8 border-t pt-10 md:mt-20 md:grid-cols-2 ${
-                bright ? "border-chocolate-dark/20" : "border-white/10"
+                bright ? "border-canvas/20" : "border-ink/10"
               }`}
             >
               {stats.map((stat) => (
@@ -246,12 +246,12 @@ const BentoPageContent = ({
             <blockquote className="mt-16 md:mt-24">
               <p
                 className={`max-w-4xl font-display text-[clamp(1.75rem,4.4vw,3.25rem)] font-black leading-[1.02] tracking-[-0.03em] ${
-                  bright ? "text-chocolate-dark" : "text-white/90"
+                  bright ? "text-canvas" : "text-ink/90"
                 }`}
               >
-                <span className="text-chocolate-accent">&ldquo;</span>
+                <span className="text-accent">&ldquo;</span>
                 {page.quote}
-                <span className="text-chocolate-accent">&rdquo;</span>
+                <span className="text-accent">&rdquo;</span>
               </p>
             </blockquote>
           )}
@@ -284,8 +284,8 @@ const BentoPageContent = ({
                 to={page.cta.to}
                 className={`group inline-flex items-center gap-3 rounded-full px-7 py-4 font-tech text-[11px] font-bold uppercase tracking-[0.25em] transition-transform duration-300 hover:scale-[1.03] ${
                   bright
-                    ? "bg-chocolate-dark text-chocolate-light-accent"
-                    : "bg-chocolate-accent text-chocolate-dark"
+                    ? "bg-canvas text-accent-soft"
+                    : "bg-accent text-canvas"
                 }`}
               >
                 {page.cta.label}

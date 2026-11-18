@@ -29,11 +29,11 @@ const BentoCard = ({
   };
 
   const themes: Record<string, string> = {
-    dark: "bg-chocolate-medium border-white/5 text-white",
-    light: "bg-white text-black border-black/5",
+    dark: "bg-surface border-ink/5 text-ink",
+    light: "bg-ink text-black border-black/5",
     accent:
-      "bg-chocolate-accent text-chocolate-dark border-chocolate-accent/20",
-    glass: "glistening-glass text-white border-0",
+      "bg-accent text-canvas border-accent/20",
+    glass: "glistening-glass text-ink border-0",
   };
 
   const hasPaddingOverride = className.includes("p-");

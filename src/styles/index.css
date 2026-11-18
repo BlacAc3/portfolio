@@ -1,16 +1,31 @@
 @import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&family=Space+Grotesk:wght@300..700&display=swap");
 @import "tailwindcss";
 
-@theme {
-    --color-chocolate-dark: #0a0a0a;
-    --color-chocolate-medium: #1d1b1a;
-    --color-chocolate-light: #2a2625;
-    --color-chocolate-accent: #d4a76a;
-    --color-chocolate-light-accent: #e8d5b5;
+/* `dark:` / `light:` follow the resolved theme on <html data-theme>. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+@custom-variant light (&:where([data-theme="light"], [data-theme="light"] *));
 
-    /* Short aliases — the UI layer uses `accent` / `light-accent`. */
-    --color-accent: #d4a76a;
-    --color-light-accent: #e8d5b5;
+/*
+ * Semantic colour tokens. Utilities (bg-canvas, text-ink/70, border-ink/10…)
+ * read these variables at runtime, so swapping the values under
+ * [data-theme="light"] re-themes the whole site without touching markup.
+ *
+ *  canvas   page background            surface  cards / panels
+ *  raised   chips, inputs, insets      ink      text + hairlines (use /alpha)
+ *  accent   brand gold (text & fills)  accent-soft  secondary gold text
+ *
+ * Contrast (WCAG): ink/canvas ≥ 15:1 in both themes; accent/canvas 9.3:1
+ * dark, 5.2:1 light (ink/canvas 11.9:1 in light); canvas-on-accent fills are equally safe.
+ */
+@theme {
+    --color-canvas: #1a1612;
+    --color-surface: #241e19;
+    --color-raised: #2f2822;
+    --color-ink: #f4ede3;
+    --color-accent: #dcb077;
+    --color-accent-soft: #ecdcc0;
+    --color-light-accent: #ecdcc0;
+    --color-glow: #dcb077;
 
     --font-display: "Bricolage Grotesque", sans-serif;
     --font-body: "Plus Jakarta Sans", sans-serif;
@@ -20,17 +35,166 @@
     --gap-apple: 24px;
 }
 
+/* Channel triplets for hand-written gradients: rgb(var(--canvas-rgb)/0.8). */
+:root {
+    --canvas-rgb: 26 22 18;
+    --surface-rgb: 36 30 25;
+    --ink-rgb: 244 237 227;
+    --accent-rgb: 220 176 119;
+    --accent-soft-rgb: 236 220 192;
+    --shadow-rgb: 0 0 0;
+    --card-shadow: 0 30px 80px -40px rgb(0 0 0 / 0.7);
+    color-scheme: dark;
+}
+
+:root[data-theme="light"] {
+    /* Soft parchment, not paper-white: lower luminance (~0.75) cuts glare
+       while ink still reads at 11.9:1 and accent text at 5.2:1. */
+    --color-canvas: #e8e0d3;
+    --color-surface: #f0eadf;
+    --color-raised: #ddd3c3;
+    --color-ink: #2b2219;
+    --color-accent: #7d5118;
+    --color-accent-soft: #5a3d1e;
+    --color-light-accent: #a8773a;
+    --color-glow: #d4a463;
+
+    --canvas-rgb: 232 224 211;
+    --surface-rgb: 240 234 223;
+    --ink-rgb: 43 34 25;
+    --accent-rgb: 125 81 24;
+    --accent-soft-rgb: 90 61 30;
+    --shadow-rgb: 74 52 28;
+    --card-shadow: 0 22px 50px -30px rgb(74 52 28 / 0.32);
+    color-scheme: light;
+}
+
 :root {
     --apple-font: var(--font-body);
-    background-color: var(--color-chocolate-dark);
-    color: white;
+    background-color: var(--color-canvas);
+    color: var(--color-ink);
 }
 
 body {
     font-family: var(--font-body);
     -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
-    background-color: var(--color-chocolate-dark);
+    background-color: var(--color-canvas);
+    color: var(--color-ink);
+}
+
+/* Theme switch: a sunrise / moonrise reveal (src/lib/celestialTransition.ts). */
+::view-transition-old(root),
+::view-transition-new(root) {
+    animation: none;
+    mix-blend-mode: normal;
+}
+
+/* The new theme shows through a soft-edged disc that rides on the rising body;
+   the old app snapshot gets the inverse, so the two meet at one soft edge.
+   The solid stop (82%) is mirrored as SOLID in celestialTransition.ts. */
+::view-transition-old(app),
+::view-transition-new(app) {
+    animation: none;
+    mix-blend-mode: normal;
+}
+
+html.celestial-vt::view-transition-new(root),
+html.celestial-vt::view-transition-new(app) {
+    -webkit-mask-image: radial-gradient(closest-side, #000 82%, transparent 100%);
+    mask-image: radial-gradient(closest-side, #000 82%, transparent 100%);
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    mask-size: 0 0;
+}
+
+html.celestial-vt::view-transition-old(app) {
+    -webkit-mask-image: radial-gradient(closest-side, #000 82%, transparent 100%), linear-gradient(#000, #000);
+    mask-image: radial-gradient(closest-side, #000 82%, transparent 100%), linear-gradient(#000, #000);
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    mask-size: 0 0, 100% 100%;
+}
+
+::view-transition-new(theme-orb-sun),
+::view-transition-new(theme-orb-moon) {
+    animation: none;
+}
+
+/* z-index -1: painted under the app, so the bodies sit in the background. */
+.celestial-orb {
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: -1;
+    pointer-events: none;
+    border-radius: 9999px;
+}
+
+.celestial-core {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+}
+
+.celestial-orb--sun .celestial-core {
+    background: radial-gradient(circle at 36% 34%, #fffbe9 0%, #ffe3a1 28%, #ffbf5a 62%, #f19a32 100%);
+    box-shadow:
+        0 0 40px 10px rgb(255 196 104 / 0.65),
+        0 0 130px 55px rgb(255 172 72 / 0.32),
+        inset -8px -10px 24px rgb(214 110 30 / 0.45);
+}
+
+.celestial-rays {
+    position: absolute;
+    inset: -42%;
+    border-radius: inherit;
+    background: repeating-conic-gradient(from 0deg, rgb(255 205 120 / 0.6) 0deg 4deg, transparent 4deg 22.5deg);
+    -webkit-mask-image: radial-gradient(closest-side, transparent 50%, #000 58%, transparent 100%);
+    mask-image: radial-gradient(closest-side, transparent 50%, #000 58%, transparent 100%);
+}
+
+.celestial-orb--moon .celestial-core {
+    background: radial-gradient(circle at 34% 30%, #fffdf7 0%, #ece6d8 45%, #cfc6b4 80%, #b3a993 100%);
+    box-shadow:
+        0 0 36px 8px rgb(236 228 210 / 0.45),
+        0 0 120px 44px rgb(170 182 224 / 0.25),
+        inset -10px -12px 22px rgb(90 80 60 / 0.35);
+}
+
+.celestial-orb--moon .celestial-core i {
+    position: absolute;
+    border-radius: 9999px;
+    background: rgb(150 138 115 / 0.35);
+    box-shadow: inset 1px 1px 3px rgb(80 70 55 / 0.4);
+}
+.celestial-orb--moon .celestial-core i:nth-child(1) { width: 24%; height: 24%; left: 52%; top: 22%; }
+.celestial-orb--moon .celestial-core i:nth-child(2) { width: 15%; height: 15%; left: 24%; top: 54%; }
+.celestial-orb--moon .celestial-core i:nth-child(3) { width: 10%; height: 10%; left: 60%; top: 64%; }
+
+/* Elevated card — tonal step up in dark, paper + soft shadow in light. */
+.surface-card {
+    background-color: var(--color-surface);
+    border: 1px solid rgb(var(--ink-rgb) / 0.08);
+    box-shadow: var(--card-shadow);
+}
+
+/* Ambient wash used behind section headers. */
+.ambient-wash {
+    background:
+        radial-gradient(60% 50% at 85% 10%, rgb(var(--accent-rgb) / 0.14), transparent 70%),
+        radial-gradient(50% 45% at 5% 90%, rgb(var(--accent-rgb) / 0.08), transparent 70%);
+    /* Feather the bottom so the glow never ends on a visible edge. */
+    -webkit-mask-image: linear-gradient(to bottom, #000 75%, transparent);
+    mask-image: linear-gradient(to bottom, #000 75%, transparent);
+}
+
+/* Faint dotted grid that reads in both themes. */
+.dot-grid {
+    background-image: radial-gradient(rgb(var(--ink-rgb) / 0.09) 1px, transparent 1px);
+    background-size: 22px 22px;
 }
 
 h1,
@@ -45,10 +209,10 @@ h3,
 }
 
 .glass-card {
-    background: rgba(255, 255, 255, 0.02);
+    background: rgb(var(--ink-rgb) / 0.03);
     backdrop-filter: blur(25px);
     -webkit-backdrop-filter: blur(25px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid rgb(var(--ink-rgb) / 0.08);
 }
 
 .text-massive {
@@ -87,7 +251,7 @@ h3,
 
 /* Visible keyboard focus everywhere — the accent ring matches the palette. */
 :focus-visible {
-    outline: 2px solid var(--color-chocolate-accent);
+    outline: 2px solid var(--color-accent);
     outline-offset: 3px;
     border-radius: 6px;
 }
@@ -117,16 +281,16 @@ h3,
 }
 
 .glistening-glass {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgb(var(--surface-rgb) / 0.55);
     backdrop-filter: blur(5px);
     -webkit-backdrop-filter: blur(5px);
     position: relative;
     overflow: hidden; /* keep the hover sweep (::after) inside the card */
     isolation: isolate;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgb(var(--ink-rgb) / 0.1);
     box-shadow:
-        0 4px 24px -1px rgba(0, 0, 0, 0.2),
-        inset 0 0 20px 0 rgba(255, 255, 255, 0.02);
+        0 4px 24px -1px rgb(var(--shadow-rgb) / 0.18),
+        inset 0 0 20px 0 rgb(var(--ink-rgb) / 0.02);
 }
 @keyframes border-glisten {
     0% {
@@ -277,4 +441,22 @@ html[data-bento-open] nav.fixed {
   .hero-scroll-dot {
     animation: none;
   }
+}
+
+/* Light theme: the white glass shimmer disappears on paper, so it turns gold. */
+[data-theme="light"] .glistening-glass::before {
+    background: linear-gradient(
+        90deg,
+        rgb(var(--accent-rgb) / 0.1) 0%,
+        rgb(var(--accent-rgb) / 0.5) 25%,
+        rgb(var(--accent-rgb) / 0.8) 50%,
+        rgb(var(--accent-rgb) / 0.5) 75%,
+        rgb(var(--accent-rgb) / 0.1) 100%
+    );
+    background-size: 200% 100%;
+}
+
+/* 3D stage: a soft floor glow under every model. */
+.stage-glow {
+    background: radial-gradient(50% 40% at 50% 62%, rgb(var(--accent-rgb) / 0.22), transparent 70%);
 }

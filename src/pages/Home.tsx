@@ -53,14 +53,14 @@ const Home = () => {
             role="dialog"
             aria-modal="true"
             aria-label="Photo of Aaron"
-            className="fixed inset-0 z-[100] bg-chocolate-dark/95 flex items-center justify-center p-4 backdrop-blur-sm"
+            className="fixed inset-0 z-[100] bg-canvas/95 flex items-center justify-center p-4 backdrop-blur-sm"
             onClick={() => setIsImageExpanded(false)}
           >
             <button
               ref={closeRef}
               type="button"
               aria-label="Close photo"
-              className="absolute top-6 right-6 text-white p-2 hover:bg-white/10 rounded-full transition-colors"
+              className="absolute top-6 right-6 text-ink p-2 hover:bg-ink/10 rounded-full transition-colors"
               onClick={() => setIsImageExpanded(false)}
             >
               <RiCloseLine size={32} aria-hidden="true" />
@@ -98,17 +98,17 @@ const Home = () => {
         >
           <h2 className="text-3xl md:text-[100px] font-black tracking-[-0.07em] leading-[0.8] md:leading-[0.75] mb-12 md:mb-16 uppercase">
             READY TO <br />
-            <span className="text-chocolate-accent">ACCELERATE?</span>
+            <span className="text-accent">ACCELERATE?</span>
           </h2>
           <Link
             to="/contact"
-            className="px-8 py-5 md:px-12 md:py-6 bg-chocolate-accent text-chocolate-dark rounded-full font-black uppercase tracking-widest hover:scale-105 transition-transform duration-300 inline-block shadow-[0_20px_60px_-15px_rgba(212,167,106,0.4)] font-tech text-xs md:text-sm"
+            className="px-8 py-5 md:px-12 md:py-6 bg-accent text-canvas rounded-full font-black uppercase tracking-widest hover:scale-105 transition-transform duration-300 inline-block shadow-[0_20px_60px_-15px_rgb(var(--accent-rgb)/0.4)] font-tech text-xs md:text-sm"
           >
             Start a Conversation
           </Link>
         </motion.div>
 
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] md:w-[600px] md:h-[600px] bg-chocolate-accent/15 blur-[80px] md:blur-[180px] rounded-full -z-10 pointer-events-none will-change-[filter,transform]" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] md:w-[600px] md:h-[600px] bg-accent/15 blur-[80px] md:blur-[180px] rounded-full -z-10 pointer-events-none will-change-[filter,transform]" />
       </section>
     </div>
   );

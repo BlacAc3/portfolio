@@ -25,6 +25,7 @@ import { coverTitleBox, coverURL, coversReady, isPortraitView, setCoverTitle } f
 import { jumpTo } from "../../lib/jump";
 import Particles from "../magicui/particles";
 import { hasWebGL, usePrefersReducedMotion } from "../../hooks/useMediaQuery";
+import { usePalette } from "../../contexts/ThemeContext";
 
 const BentoBoxCanvas = lazy(() => import("./BentoBoxScene"));
 
@@ -35,12 +36,34 @@ interface BentoShowcaseProps {
   hero?: ReactNode;
 }
 
-/** Page background per theme — the colour the compartment face "becomes". */
-const faceColour: Record<BentoCell["theme"], [number, number, number]> = {
-  glass: [29, 27, 26],
-  dark: [10, 10, 10],
-  accent: [212, 167, 106],
-  photo: [42, 38, 37],
+/**
+ * Page layer background — the same token the page content paints, so as the
+ * cover dissolves it fades into the page's own colour in either theme
+ * (a fixed dark fill turned light-mode frames muddy grey mid-morph).
+ */
+const pageFill: Record<BentoCell["theme"], string> = {
+  glass: "var(--color-surface)",
+  dark: "var(--color-canvas)",
+  accent: "var(--color-accent)",
+  photo: "var(--color-raised)",
+};
+
+/**
+ * Headline colour on the 3D face. The faces stay dark (gold for "accent") in
+ * both themes, so the cover title is chosen for the face, not the page —
+ * light-mode ink on a dark face was unreadable. The flyer then blends from
+ * this to the page headline's real colour as it lands.
+ */
+const faceInk: Record<BentoCell["theme"], [number, number, number]> = {
+  glass: [244, 237, 227],
+  dark: [244, 237, 227],
+  accent: [26, 22, 18],
+  photo: [244, 237, 227],
+};
+
+const parseRGB = (c: string): [number, number, number] => {
+  const m = c.match(/[\d.]+/g)?.map(Number) ?? [0, 0, 0];
+  return [m[0] ?? 0, m[1] ?? 0, m[2] ?? 0];
 };
 /**
  * CSS matrix3d that maps a w×h box onto an arbitrary quad (TL TR BR BL):
@@ -176,11 +199,11 @@ function StaticShowcase({ experience, onExpandImage, hero }: BentoShowcaseProps)
         </p>
         <h2
           id="synergy-title"
-          className="mt-5 font-display text-[clamp(2.6rem,10vw,6rem)] font-semibold leading-[0.92] tracking-tight text-white"
+          className="mt-5 font-display text-[clamp(2.6rem,10vw,6rem)] font-semibold leading-[0.92] tracking-tight text-ink"
         >
           The synergy
         </h2>
-        <p className="mt-4 max-w-md text-sm leading-relaxed text-white/60">
+        <p className="mt-4 max-w-md text-sm leading-relaxed text-ink/60">
           Design &amp; engineering, boxed into one system.
         </p>
       </div>
@@ -188,7 +211,7 @@ function StaticShowcase({ experience, onExpandImage, hero }: BentoShowcaseProps)
         {bentoCells.map((cell, i) => (
           <div
             key={cell.id}
-            className="overflow-hidden rounded-3xl border border-white/10"
+            className="overflow-hidden rounded-3xl border border-ink/10"
           >
             <BentoPageContent
               cell={cell}
@@ -222,6 +245,7 @@ export default function BentoShowcase({
   const reduced = usePrefersReducedMotion();
   const [webgl] = useState(hasWebGL);
   const enabled = webgl && !reduced;
+  const palette = usePalette();
 
   const sectionRef = useRef<HTMLElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
@@ -245,6 +269,10 @@ export default function BentoShowcase({
     const titleEls = pages.map((p) => p.querySelector<HTMLElement>("[data-title]"));
     const flyers = pages.map((p) => p.querySelector<HTMLElement>("[data-flyer]"));
     const flyBox: ({ x: number; y: number; w: number; h: number } | null)[] = pages.map(() => null);
+    // Flyer colour: from the face's ink to the page headline's (per theme).
+    const flyInk: { from: [number, number, number]; to: [number, number, number] }[] = pages.map(
+      () => ({ from: [244, 237, 227], to: [244, 237, 227] }),
+    );
     const intro = stage.querySelector<HTMLElement>("[data-intro]");
     const cue = stage.querySelector<HTMLElement>("[data-cue]");
     const chrome = stage.querySelector<HTMLElement>("[data-chrome]");
@@ -358,8 +386,10 @@ export default function BentoShowcase({
           fontSize: cs.fontSize,
           lineHeight: cs.lineHeight,
           letterSpacing: cs.letterSpacing,
-          color: cs.color,
         });
+        const from = faceInk[bentoCells[i]?.theme ?? "dark"];
+        flyInk[i] = { from, to: parseRGB(cs.color) };
+        fly.style.color = `rgb(${from.join(",")})`;
         const w = fly.offsetWidth;
         const h = fly.offsetHeight;
         const { x, y } = offsetWithin(el, page);
@@ -371,7 +401,7 @@ export default function BentoShowcase({
           letterSpacing: parseFloat(cs.letterSpacing) || 0,
           lineHeight: parseFloat(cs.lineHeight) || size,
           widest: w,
-          color: cs.color,
+          color: `rgb(${from.join(",")})`,
         });
       });
     };
@@ -394,6 +424,13 @@ export default function BentoShowcase({
     ro.observe(stage);
     scrollers.forEach((s) => ro.observe(s));
     document.fonts?.ready.then(measure);
+    // Theme flips change the headline colour (and nothing else): re-measure
+    // titles so the flyer lands on the right ink, then redraw the frame.
+    const themeObs = new MutationObserver(() => {
+      measureTitles();
+      lastKey = "";
+    });
+    themeObs.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
 
     /* ---------- DOM pass ---------- */
     const showPage = (index: number) => {
@@ -445,6 +482,14 @@ export default function BentoShowcase({
       page.style.opacity = String(easeOutQuart(seg(frame.morph, 0, 0.16)));
       const small = W < 768;
 
+      // One veil over everything in flight — cover, flying headline and the
+      // resolving page together — so no layer ever reads as a hard swap.
+      // Zero on the face and on landing; filter runs before clip-path, so the
+      // card's edge stays crisp while what's inside it softens.
+      const veil = Math.sin(Math.PI * seg(frame.morph, 0.05, 0.96)) * (small ? 3 : 5);
+      const pf = veil > 0.05 ? `blur(${veil.toFixed(2)}px)` : "none";
+      if (page.style.filter !== pf) page.style.filter = pf;
+
       const xs = poly.map((p) => p[0]);
       const ys = poly.map((p) => p[1]);
       const bx = Math.min(...xs);
@@ -458,7 +503,7 @@ export default function BentoShowcase({
         // "inherit", not "visible": a visible child would outlive its hidden page.
         cover.style.visibility = c > 0.001 ? "inherit" : "hidden";
         if (c > 0.001) {
-          const blur = easeInOutCubic(seg(frame.morph, 0.12, 0.68)) * (small ? 10 : 18);
+          const blur = easeInOutCubic(seg(frame.morph, 0.12, 0.68)) * (small ? 8 : 12);
           cover.style.opacity = String(c);
           cover.style.filter = blur > 0.05 ? `blur(${blur.toFixed(2)}px)` : "none";
           cover.style.width = `${W}px`;
@@ -494,8 +539,15 @@ export default function BentoShowcase({
       const tb = fly && fb ? coverTitleBox(i, isPortraitView(W, H)) : null;
       if (fly && fb && titleEl) {
         const on = !!tb && frame.morph < 0.999;
-        fly.style.visibility = on ? "inherit" : "hidden";
-        titleEl.style.visibility = on ? "hidden" : "";
+        // Landing: the flyer dissolves into the real headline instead of
+        // swapping on the last frame (sub-pixel and hinting differences
+        // between the two made that swap visibly jump).
+        const hand = on ? easeInOutCubic(seg(frame.morph, 0.78, 0.97)) : 1;
+        fly.style.visibility = on && hand < 0.999 ? "inherit" : "hidden";
+        titleEl.style.visibility = on && hand <= 0.001 ? "hidden" : "";
+        titleEl.style.opacity = on ? hand.toFixed(3) : "";
+        const tblur = on ? (1 - hand) * (small ? 3 : 5) : 0;
+        titleEl.style.filter = tblur > 0.05 ? `blur(${tblur.toFixed(2)}px)` : "";
         if (on && tb) {
           const k = easeInOutCubic(seg(frame.morph, 0.04, 0.9));
           const from = [
@@ -515,7 +567,11 @@ export default function BentoShowcase({
           ];
           // A slight in-flight blur: zero on the face and on landing, so both
           // ends stay crisp, softest mid-travel when the text moves fastest.
-          const fb2 = Math.sin(Math.PI * k) * (small ? 1.2 : 2);
+          const fb2 = Math.sin(Math.PI * k) * (small ? 3 : 5) + hand * (small ? 3 : 5);
+          fly.style.opacity = (1 - hand).toFixed(3);
+          const ink = flyInk[i];
+          const ck = easeInOutCubic(seg(frame.morph, 0.2, 0.8));
+          fly.style.color = `rgb(${ink.from.map((v, n) => Math.round(lerp(v, ink.to[n], ck))).join(",")})`;
           fly.style.filter = fb2 > 0.05 ? `blur(${fb2.toFixed(2)}px)` : "none";
           fly.style.transform = quadMatrix(
             fb.w,
@@ -705,6 +761,7 @@ export default function BentoShowcase({
       window.clearTimeout(tapTimer);
       io.disconnect();
       ro.disconnect();
+      themeObs.disconnect();
       window.clearTimeout(refreshTimer);
       gsap.ticker.remove(render);
       root.removeAttribute("data-bento-open");
@@ -727,27 +784,27 @@ export default function BentoShowcase({
       ref={sectionRef}
       id="synergy"
       aria-labelledby="synergy-title"
-      className="relative z-10 w-full bg-chocolate-dark"
+      className="relative z-10 w-full bg-canvas"
       style={{ height: "900vh" }}
     >
       <div
         ref={stageRef}
-        className="sticky top-0 h-[100svh] w-full overflow-hidden bg-chocolate-dark"
+        className="sticky top-0 h-[100svh] w-full overflow-hidden bg-canvas"
       >
         {/* Ambient depth behind the box */}
         <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-          <div className="absolute left-1/2 top-1/2 h-[70vmax] w-[70vmax] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(212,167,106,0.17),rgba(212,167,106,0.05)_38%,transparent_64%)]" />
-          <div className="absolute -left-32 bottom-0 h-[40vmax] w-[40vmax] rounded-full bg-[radial-gradient(circle,rgba(232,213,181,0.05),transparent_65%)]" />
-          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(10,10,10,0.85),rgba(10,10,10,0.15)_36%,rgba(10,10,10,0.8))]" />
+          <div className="absolute left-1/2 top-1/2 h-[70vmax] w-[70vmax] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgb(var(--accent-rgb)/0.17),rgb(var(--accent-rgb)/0.05)_38%,transparent_64%)]" />
+          <div className="absolute -left-32 bottom-0 h-[40vmax] w-[40vmax] rounded-full bg-[radial-gradient(circle,rgb(var(--accent-soft-rgb)/0.05),transparent_65%)]" />
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgb(var(--canvas-rgb)/0.85),rgb(var(--canvas-rgb)/0.15)_36%,rgb(var(--canvas-rgb)/0.8))]" />
           {/* Hero only: the site's star field (the stage is opaque, so the
               global one can't show through) and a warm pool of light the
               closed box rests in. Both fade as the box rises. */}
           <div data-hero-stars className="absolute inset-0">
-            <Particles className="absolute inset-0" quantity={160} ease={50} color="#FFFFFF" refresh />
+            <Particles className="absolute inset-0" quantity={160} ease={50} color={palette.particles} refresh />
           </div>
           <div
             data-hero-bg
-            className="absolute inset-x-0 bottom-0 h-[70%] bg-[radial-gradient(ellipse_50%_38%_at_50%_76%,rgba(212,167,106,0.3),transparent_70%)]"
+            className="absolute inset-x-0 bottom-0 h-[70%] bg-[radial-gradient(ellipse_50%_38%_at_50%_76%,rgb(var(--accent-rgb)/0.3),transparent_70%)]"
           />
         </div>
 
@@ -763,7 +820,7 @@ export default function BentoShowcase({
           type="button"
           data-peek
           aria-label="Peek inside the bento box"
-          className="absolute left-0 top-0 z-[15] cursor-pointer rounded-[24px] outline-none focus-visible:ring-2 focus-visible:ring-chocolate-accent/70"
+          className="absolute left-0 top-0 z-[15] cursor-pointer rounded-[24px] outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
           style={{ visibility: "hidden" }}
         />
 
@@ -785,7 +842,7 @@ export default function BentoShowcase({
         >
           <div
             aria-hidden="true"
-            className="absolute inset-x-0 bottom-0 h-[58vh] bg-[linear-gradient(to_top,rgba(10,10,10,0.94),rgba(10,10,10,0.6)_44%,transparent)]"
+            className="absolute inset-x-0 bottom-0 h-[58vh] bg-[linear-gradient(to_top,rgb(var(--canvas-rgb)/0.94),rgb(var(--canvas-rgb)/0.6)_44%,transparent)]"
           />
           <div className="absolute inset-x-0 bottom-0 flex flex-col gap-4 px-6 pb-12 sm:gap-5 sm:px-10 sm:pb-16 lg:px-14 lg:pb-20">
             <p className="font-tech text-[0.55rem] uppercase tracking-[0.5em] text-accent/85 sm:text-[0.6rem]">
@@ -793,16 +850,16 @@ export default function BentoShowcase({
             </p>
             <h2
               id="synergy-title"
-              className="max-w-[18ch] font-display text-[clamp(2.15rem,5.4vw,4rem)] font-semibold leading-[0.94] tracking-[-0.03em] text-white"
+              className="max-w-[18ch] font-display text-[clamp(2.15rem,5.4vw,4rem)] font-semibold leading-[0.94] tracking-[-0.03em] text-ink"
             >
               The synergy
             </h2>
-            <p className="max-w-[32ch] text-sm leading-relaxed text-white/70 sm:text-base">
+            <p className="max-w-[32ch] text-sm leading-relaxed text-ink/70 sm:text-base">
               Design &amp; engineering, boxed into one system.
             </p>
             <p
               data-cue
-              className="mt-2 flex items-center gap-3 font-tech text-[0.55rem] uppercase tracking-[0.4em] text-white/50 sm:text-[0.6rem]"
+              className="mt-2 flex items-center gap-3 font-tech text-[0.55rem] uppercase tracking-[0.4em] text-ink/50 sm:text-[0.6rem]"
             >
               <span
                 aria-hidden="true"
@@ -817,7 +874,7 @@ export default function BentoShowcase({
         <div
           data-caption
           aria-hidden="true"
-          className="pointer-events-none absolute bottom-10 left-1/2 z-20 flex flex-col items-center gap-2 text-center opacity-0 sm:bottom-14"
+          className="pointer-events-none absolute bottom-10 left-1/2 z-20 flex max-w-[calc(100vw-2rem)] flex-col items-center gap-2 rounded-2xl border border-ink/10 bg-canvas/95 px-6 py-4 text-center opacity-0 shadow-[var(--card-shadow)] backdrop-blur-md sm:bottom-14"
           style={{ transform: "translate3d(-50%,14px,0)" }}
         >
           <p
@@ -826,7 +883,7 @@ export default function BentoShowcase({
           />
           <p
             data-caption-title
-            className="max-w-[22ch] font-display text-xl font-semibold leading-tight tracking-tight text-white sm:text-2xl"
+            className="max-w-[22ch] font-display text-xl font-semibold leading-tight tracking-tight text-ink sm:text-2xl"
           />
         </div>
 
@@ -841,7 +898,7 @@ export default function BentoShowcase({
               visibility: "hidden",
               opacity: 0,
               pointerEvents: "none",
-              background: `rgb(${faceColour[cell.theme].join(",")})`,
+              background: pageFill[cell.theme],
               clipPath: "polygon(50% 50%,50% 50%,50% 50%,50% 50%)",
             }}
           >
@@ -889,7 +946,7 @@ export default function BentoShowcase({
         >
           {/* Desktop: a rail of chapters; labels slide out on hover. */}
           <div className="absolute right-3 top-1/2 hidden -translate-y-1/2 sm:block lg:right-5">
-            <ol className="pointer-events-auto flex list-none flex-col items-end gap-0.5 rounded-full border border-white/10 bg-chocolate-dark/45 px-1.5 py-3 backdrop-blur-md">
+            <ol className="pointer-events-auto flex list-none flex-col items-end gap-0.5 rounded-full border border-ink/10 bg-canvas/45 px-1.5 py-3 backdrop-blur-md">
               {CHAPTERS.map((c, k) => (
                 <li key={c.key}>
                   <button
@@ -898,13 +955,13 @@ export default function BentoShowcase({
                     aria-label={`Jump to ${c.label}`}
                     className="group/j relative flex h-6 w-6 items-center justify-center outline-none"
                   >
-                    <span className="pointer-events-none absolute right-8 flex translate-x-2 items-center gap-2 whitespace-nowrap rounded-full border border-white/10 bg-chocolate-dark/85 px-3 py-1.5 font-tech text-[10px] font-bold uppercase tracking-[0.25em] text-white/80 opacity-0 backdrop-blur-md transition duration-300 group-hover/j:translate-x-0 group-hover/j:opacity-100 group-focus-visible/j:translate-x-0 group-focus-visible/j:opacity-100">
+                    <span className="pointer-events-none absolute right-8 flex translate-x-2 items-center gap-2 whitespace-nowrap rounded-full border border-ink/10 bg-canvas/85 px-3 py-1.5 font-tech text-[10px] font-bold uppercase tracking-[0.25em] text-ink/80 opacity-0 backdrop-blur-md transition duration-300 group-hover/j:translate-x-0 group-hover/j:opacity-100 group-focus-visible/j:translate-x-0 group-focus-visible/j:opacity-100">
                       {k > 0 && k <= bentoCells.length && (
-                        <span className="text-chocolate-accent">{pad(k)}</span>
+                        <span className="text-accent">{pad(k)}</span>
                       )}
                       {c.label}
                     </span>
-                    <span className="h-[3px] w-[3px] rounded-full bg-white/40 transition-all duration-500 group-hover/j:bg-white group-focus-visible/j:bg-white group-aria-[current=step]/j:h-4 group-aria-[current=step]/j:w-[3px] group-aria-[current=step]/j:bg-chocolate-accent" />
+                    <span className="h-[3px] w-[3px] rounded-full bg-ink/40 transition-all duration-500 group-hover/j:bg-ink group-focus-visible/j:bg-ink group-aria-[current=step]/j:h-4 group-aria-[current=step]/j:w-[3px] group-aria-[current=step]/j:bg-accent" />
                   </button>
                 </li>
               ))}
@@ -913,24 +970,24 @@ export default function BentoShowcase({
 
           {/* Phones: a compact pill — previous / current / next. */}
           <div className="absolute inset-x-0 bottom-[max(1rem,env(safe-area-inset-bottom))] flex justify-center sm:hidden">
-            <div className="pointer-events-auto flex items-center gap-1 rounded-full border border-white/10 bg-chocolate-dark/70 p-1 backdrop-blur-md">
+            <div className="pointer-events-auto flex items-center gap-1 rounded-full border border-ink/10 bg-canvas/70 p-1 backdrop-blur-md">
               <button
                 type="button"
                 data-jump-step={-1}
                 aria-label="Previous chapter"
-                className="grid h-10 w-10 place-items-center rounded-full text-white/80 transition active:scale-90 disabled:opacity-25"
+                className="grid h-10 w-10 place-items-center rounded-full text-ink/80 transition active:scale-90 disabled:opacity-25"
               >
                 <svg aria-hidden="true" viewBox="0 0 16 16" className="h-4 w-4"><path d="M8 12V4M4 8l4-4 4 4" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /></svg>
               </button>
-              <p className="min-w-[8.5rem] text-center font-tech text-[10px] font-bold uppercase tracking-[0.25em] text-white/85" aria-live="polite">
-                <span data-jump-num className="mr-2 text-chocolate-accent">··</span>
+              <p className="min-w-[8.5rem] text-center font-tech text-[10px] font-bold uppercase tracking-[0.25em] text-ink/85" aria-live="polite">
+                <span data-jump-num className="mr-2 text-accent">··</span>
                 <span data-jump-label>Intro</span>
               </p>
               <button
                 type="button"
                 data-jump-step={1}
                 aria-label="Next chapter"
-                className="grid h-10 w-10 place-items-center rounded-full bg-white/10 text-white transition active:scale-90 disabled:opacity-25"
+                className="grid h-10 w-10 place-items-center rounded-full bg-ink/10 text-ink transition active:scale-90 disabled:opacity-25"
               >
                 <svg aria-hidden="true" viewBox="0 0 16 16" className="h-4 w-4"><path d="M8 4v8M4 8l4 4 4-4" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /></svg>
               </button>
@@ -944,30 +1001,30 @@ export default function BentoShowcase({
           className="absolute inset-0 z-30 flex flex-col items-center justify-center px-6 text-center"
           style={{ opacity: 0, visibility: "hidden", pointerEvents: "none" }}
         >
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_55%,rgba(10,10,10,0.9),rgba(10,10,10,0.5)_60%,rgba(10,10,10,0.2)_100%)]" />
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_55%,rgb(var(--canvas-rgb)/0.9),rgb(var(--canvas-rgb)/0.5)_60%,rgb(var(--canvas-rgb)/0.2)_100%)]" />
           <div className="relative z-10">
             <p className="font-tech text-[0.6rem] uppercase tracking-[0.5em] text-accent/90">
               The full picture
             </p>
-            <h2 className="mt-6 max-w-[18ch] font-display text-[clamp(2.4rem,7.5vw,5.4rem)] font-semibold leading-[0.94] tracking-tight text-white">
+            <h2 className="mt-6 max-w-[18ch] font-display text-[clamp(2.4rem,7.5vw,5.4rem)] font-semibold leading-[0.94] tracking-tight text-ink">
               Design that moves.
               <br />
               Engineering that lasts.
             </h2>
-            <p className="mx-auto mt-6 max-w-sm text-sm leading-relaxed text-white/65 sm:text-base">
+            <p className="mx-auto mt-6 max-w-sm text-sm leading-relaxed text-ink/65 sm:text-base">
               Six disciplines, one system. Let&apos;s build the next one
               together.
             </p>
             <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <Link
                 to="/contact"
-                className="inline-flex items-center justify-center rounded-full bg-accent px-7 py-3 font-tech text-[0.65rem] uppercase tracking-[0.28em] text-chocolate-dark transition-colors hover:bg-light-accent"
+                className="inline-flex items-center justify-center rounded-full bg-accent px-7 py-3 font-tech text-[0.65rem] uppercase tracking-[0.28em] text-canvas transition-colors hover:bg-light-accent"
               >
                 Start a project
               </Link>
               <Link
                 to="/work"
-                className="inline-flex items-center justify-center rounded-full border border-white/20 px-7 py-3 font-tech text-[0.65rem] uppercase tracking-[0.28em] text-white/80 transition-colors hover:border-white/45 hover:text-white"
+                className="inline-flex items-center justify-center rounded-full border border-ink/20 px-7 py-3 font-tech text-[0.65rem] uppercase tracking-[0.28em] text-ink/80 transition-colors hover:border-ink/45 hover:text-ink"
               >
                 See the work
               </Link>

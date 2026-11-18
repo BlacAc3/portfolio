@@ -4,6 +4,7 @@ import MouseTracker from "./components/Home/MouseTracker";
 import Navbar from "./components/Layout/Navbar";
 import Footer from "./components/Layout/Footer";
 import Particles from "./components/magicui/particles";
+import { usePalette } from "./contexts/ThemeContext";
 
 // Pages
 import HomePage from "./pages/Home";
@@ -27,6 +28,7 @@ import { useLenisSetup } from "./hooks/useLenisSetup";
 const App = () => {
   const location = useLocation();
   useLenisSetup();
+  const palette = usePalette();
 
   return (
     <div className="app relative min-h-screen">
@@ -35,7 +37,7 @@ const App = () => {
         className="fixed inset-0 z-0 pointer-events-none"
         quantity={250}
         ease={50}
-        color="#FFFFFF"
+        color={palette.particles}
         refresh
       />
 

@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import { HiArrowRight } from "react-icons/hi2";
 import MagneticButton from "../Shared/MagneticButton";
 
 const MotionLink = motion.create(Link);
@@ -35,7 +36,7 @@ const HeroSection = ({ standalone = false }: { standalone?: boolean }) => (
             transition={{ duration: 1.1, ease }}
             className="block text-left md:col-span-12"
           >
-            <span data-hero-l className="inline-block text-white -ml-[0.05em] md:-ml-[0.07em]">
+            <span data-hero-l className="inline-block text-ink -ml-[0.05em] md:-ml-[0.07em]">
               Designing
             </span>
           </motion.span>
@@ -45,7 +46,7 @@ const HeroSection = ({ standalone = false }: { standalone?: boolean }) => (
             transition={{ duration: 1.1, delay: 0.08, ease }}
             className="mt-2 block text-right sm:mt-4 md:col-span-7 md:col-start-6 md:row-start-2 md:pr-6 lg:pr-10"
           >
-            <span data-hero-r className="inline-block text-chocolate-accent">
+            <span data-hero-r className="inline-block text-accent">
               The Future
             </span>
           </motion.span>
@@ -57,12 +58,12 @@ const HeroSection = ({ standalone = false }: { standalone?: boolean }) => (
           transition={{ duration: 1, delay: 0.3, ease }}
           className="mt-10 flex flex-col items-center text-center md:col-span-5 md:col-start-1 md:row-start-2 md:mt-[clamp(1.5rem,3.2vw,3rem)] md:items-start md:text-left"
         >
-          <p className="flex items-center gap-3 font-tech text-[11px] font-bold uppercase tracking-[0.4em] text-chocolate-accent">
-            <span aria-hidden="true" className="hidden h-px w-8 bg-chocolate-accent/60 md:block" />
+          <p className="flex items-center gap-3 font-tech text-[11px] font-bold uppercase tracking-[0.4em] text-accent">
+            <span aria-hidden="true" className="hidden h-px w-8 bg-accent/60 md:block" />
             The Architect
           </p>
-          <p className="mt-4 max-w-sm text-balance text-base leading-relaxed text-white/60 md:max-w-[22rem] md:text-[17px]">
-            Hi, I&apos;m <span className="font-semibold text-white">Aaron Ezeala</span>. I
+          <p className="mt-4 max-w-sm text-balance text-base leading-relaxed text-ink/60 md:max-w-[22rem] md:text-[17px]">
+            Hi, I&apos;m <span className="font-semibold text-ink">Aaron Ezeala</span>. I
             build <span className="whitespace-nowrap">high-fidelity</span> interfaces and robust systems for the next
             generation of the web.
           </p>
@@ -71,23 +72,23 @@ const HeroSection = ({ standalone = false }: { standalone?: boolean }) => (
             <MagneticButton>
               <MotionLink
                 to="/work"
-                className="group pointer-events-auto relative inline-flex items-center gap-3 overflow-hidden rounded-full bg-white py-3 pl-6 pr-3 text-sm font-bold text-chocolate-dark sm:text-[15px]"
+                className="group pointer-events-auto relative inline-flex min-h-12 items-center gap-3.5 overflow-hidden rounded-full bg-ink py-2 pl-6 pr-2 text-sm font-bold text-canvas sm:text-[15px]"
                 whileHover={{ scale: 1.04 }}
                 whileTap={{ scale: 0.96 }}
               >
-                <span aria-hidden="true" className="absolute inset-0 bg-chocolate-accent opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100" />
+                <span aria-hidden="true" className="absolute inset-0 bg-accent opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100" />
                 <span className="relative z-10">Explore work</span>
-                <span aria-hidden="true" className="relative z-10 grid h-7 w-7 place-items-center rounded-full bg-chocolate-dark text-white transition-transform duration-300 group-hover:translate-x-0.5">
-                  →
+                <span aria-hidden="true" className="relative z-10 grid h-8 w-8 place-items-center rounded-full bg-canvas text-ink transition-transform duration-300 group-hover:translate-x-0.5">
+                  <HiArrowRight className="h-4 w-4" strokeWidth={0.6} />
                 </span>
               </MotionLink>
             </MagneticButton>
             <Link
               to="/contact"
-              className="group pointer-events-auto relative py-1 text-sm font-bold text-white/80 transition-colors hover:text-white sm:text-[15px]"
+              className="group pointer-events-auto relative py-1 text-sm font-bold text-ink/80 transition-colors hover:text-ink sm:text-[15px]"
             >
               Get in touch
-              <span aria-hidden="true" className="absolute inset-x-0 -bottom-0.5 h-px origin-left bg-chocolate-accent transition-transform duration-500 group-hover:scale-x-[0.4]" />
+              <span aria-hidden="true" className="absolute inset-x-0 -bottom-0.5 h-px origin-left bg-accent transition-transform duration-500 group-hover:scale-x-[0.4]" />
             </Link>
           </div>
         </motion.div>
@@ -100,10 +101,10 @@ const HeroSection = ({ standalone = false }: { standalone?: boolean }) => (
         transition={{ duration: 1, delay: 0.6 }}
         className="mt-auto hidden justify-center font-tech text-[10px] font-bold uppercase tracking-[0.35em] md:flex"
       >
-        <span className="flex flex-col items-center gap-3 text-white/45">
+        <span className="flex flex-col items-center gap-3 text-ink/45">
           Hover to peek · Scroll to unbox
-          <span aria-hidden="true" className="relative h-8 w-px overflow-hidden bg-white/20">
-            <span className="hero-scroll-dot absolute inset-x-0 top-0 h-3 bg-chocolate-accent" />
+          <span aria-hidden="true" className="relative h-8 w-px overflow-hidden bg-ink/20">
+            <span className="hero-scroll-dot absolute inset-x-0 top-0 h-3 bg-accent" />
           </span>
         </span>
       </motion.div>

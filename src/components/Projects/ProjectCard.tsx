@@ -46,21 +46,21 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
             >
               {project.tag}
             </span>
-            <span className="text-xs text-chocolate-light-accent">
+            <span className="text-xs text-accent-soft">
               {project.subTag}
             </span>
           </div>
-          <h3 className="text-xl font-bold mb-2 text-chocolate-light-accent">
+          <h3 className="text-xl font-bold mb-2 text-accent-soft">
             {project.title}
           </h3>
-          <p className="text-chocolate-light-accent mb-4">
+          <p className="text-accent-soft mb-4">
             {project.description}
           </p>
           <div className="flex flex-wrap gap-2 mb-4">
             {project.technologies.map((tech, index) => (
               <span
                 key={index}
-                className="text-xs px-2 py-1 rounded bg-chocolate-medium text-chocolate-light-accent"
+                className="text-xs px-2 py-1 rounded bg-surface text-accent-soft"
               >
                 {tech}
               </span>
@@ -71,7 +71,7 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
               <a
                 key={index}
                 href={link.url}
-                className="text-chocolate-accent hover:underline"
+                className="text-accent hover:underline"
               >
                 {link.text}
               </a>

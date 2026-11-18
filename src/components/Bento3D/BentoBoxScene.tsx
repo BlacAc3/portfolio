@@ -14,6 +14,7 @@ import {
   RoundedBox,
 } from "@react-three/drei";
 import * as THREE from "three";
+import { useTheme, type Theme } from "../../contexts/ThemeContext";
 import { coverCanvas, coversReady, isPortraitView, onCoversChange } from "./covers";
 import {
   bentoCells,
@@ -34,6 +35,17 @@ const C = {
   light: "#2a2625",
   accent: "#d4a76a",
   lightAccent: "#e8d5b5",
+};
+
+/**
+ * Shell finish per theme. The tray is what the hero view mostly sees, so it
+ * carries the contrast: on the dark page a light cognac lacquer under an
+ * espresso lid (two-tone, like a lacquered jubako); on parchment a deep
+ * chocolate that reads as a solid silhouette.
+ */
+const SHELL: Record<Theme, { tray: string; lid: string; well: string }> = {
+  dark: { tray: "#9a6f4b", lid: "#4f3d31", well: "#2c2521" },
+  light: { tray: "#3b2b20", lid: "#4d3b2d", well: "#2c2521" },
 };
 
 /* ------------------------------------------------------------------ */
@@ -242,6 +254,7 @@ const CoverInlay = ({
 /* The bento box                                                       */
 /* ------------------------------------------------------------------ */
 const BentoBox = ({ api }: { api: RefObject<BentoSceneHandle | null> }) => {
+  const { theme } = useTheme();
   const rig = useRef<THREE.Group>(null);
   const lid = useRef<THREE.Group>(null);
   const blocks = useRef<(THREE.Mesh | null)[]>([]);
@@ -312,6 +325,15 @@ const BentoBox = ({ api }: { api: RefObject<BentoSceneHandle | null> }) => {
     }),
     [],
   );
+
+  // Re-finish the shell when the theme flips; the scroll loop redraws it.
+  useEffect(() => {
+    const f = SHELL[theme];
+    shell.tray.color.set(f.tray);
+    shell.lid.color.set(f.lid);
+    shell.well.color.set(f.well);
+    shell.tray.clearcoatRoughness = theme === "dark" ? 0.12 : 0.18;
+  }, [theme, shell]);
 
   useEffect(
     () => () => {
@@ -601,6 +623,14 @@ const BentoBox = ({ api }: { api: RefObject<BentoSceneHandle | null> }) => {
         position-y={TRAY_H - 0.011}
         material={shell.gold}
       />
+      {/* Second pin-line at the foot: frames the tray's base against the page */}
+      <RoundedBox
+        args={[OUTER_W + 0.012, 0.018, OUTER_D + 0.012]}
+        radius={0.009}
+        smoothness={3}
+        position-y={0.05}
+        material={shell.gold}
+      />
       {/* Compartment well + slots */}
       <RoundedBox
         args={[INNER_W + 0.08, 0.02, INNER_D + 0.08]}
@@ -726,7 +756,9 @@ const BentoBoxCanvas = ({ api }: BentoBoxCanvasProps) => (
       <Lightformer form="rect" intensity={1.6} position={[0, 3, -7]} scale={[12, 1.2, 1]} color={C.lightAccent} />
       {/* Soft warm panel in front, so the tray's front face — what the
           near-level hero view mostly sees — reads as lacquer, not a void. */}
-      <Lightformer form="rect" intensity={0.9} position={[0, 0.6, 9]} scale={[9, 1.6, 1]} color={C.lightAccent} />
+      <Lightformer form="rect" intensity={1.3} position={[0, 0.6, 9]} scale={[9, 1.6, 1]} color={C.lightAccent} />
+      {/* Low strip under the front edge: a bright line along the tray's foot. */}
+      <Lightformer form="rect" intensity={1.1} position={[0, -1.2, 6]} rotation-x={-0.4} scale={[10, 0.6, 1]} color="#ffe2bd" />
     </Environment>
 
     <BentoBox api={api} />
