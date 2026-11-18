@@ -1,70 +1,45 @@
-
-import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 import { FaGithub, FaLinkedin, FaTwitter } from "react-icons/fa";
+
+const socials = [
+  { href: "https://github.com/blacac3", label: "GitHub", Icon: FaGithub },
+  { href: "https://linkedin.com/in/aaron-ezeala", label: "LinkedIn", Icon: FaLinkedin },
+  { href: "https://twitter.com/blacac3_dev", label: "Twitter / X", Icon: FaTwitter },
+];
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="py-8 px-4 sm:px-6 lg:px-8 border-t border-chocolate-light">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex flex-col md:flex-row justify-between items-center">
-          <motion.div
-            className="mb-4 md:mb-0"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
+    <footer className="relative z-10 border-t border-white/10 px-4 py-10 sm:px-6 lg:px-8">
+      <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-6 md:flex-row">
+        <div className="text-center md:text-left">
+          <Link
+            to="/"
+            className="font-display text-xl font-bold tracking-tight text-white transition-colors hover:text-chocolate-accent"
           >
-            <motion.span
-              className="text-xl font-bold text-chocolate-accent"
-              whileHover={{ scale: 1.05 }}
-            >
-              Blacac3 Portfolio
-            </motion.span>
-            <p className="text-chocolate-light-accent mt-1">
-              © {currentYear} Blacac3 Developer. All rights reserved.
-            </p>
-          </motion.div>
-
-          <motion.div
-            className="flex space-x-6"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-          >
-            <motion.a
-              href="https://github.com/blacac3"
-              target="_blank"
-              className="text-chocolate-light-accent hover:text-chocolate-accent transition"
-              whileHover={{ y: -5 }}
-            >
-              <FaGithub className="text-xl" />
-            </motion.a>
-            <motion.a
-              href="https://linkedin.com/in/aaron-ezeala"
-              target="_blank"
-              className="text-chocolate-light-accent hover:text-chocolate-accent transition"
-              whileHover={{ y: -5 }}
-            >
-              <FaLinkedin className="text-xl" />
-            </motion.a>
-            <motion.a
-              href="https://twitter.com/blacac3_dev"
-              target="_blank"
-              className="text-chocolate-light-accent hover:text-chocolate-accent transition"
-              whileHover={{ y: -5 }}
-            >
-              <FaTwitter className="text-xl" />
-            </motion.a>
-            {/* <motion.a
-              href="#"
-              className="text-chocolate-light-accent hover:text-chocolate-accent transition"
-              whileHover={{ y: -5 }}
-            >
-              <FaInstagram className="text-xl" />
-            </motion.a> */}
-          </motion.div>
+            Blacac3<span className="text-chocolate-accent">.</span>
+          </Link>
+          <p className="mt-1 text-sm text-white/60">
+            © {currentYear} Aaron Ezeala. Designed &amp; engineered in-house.
+          </p>
         </div>
+
+        <ul className="flex items-center gap-2" aria-label="Social profiles">
+          {socials.map(({ href, label, Icon }) => (
+            <li key={href}>
+              <a
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`${label} (opens in a new tab)`}
+                className="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 text-white/70 transition-[color,border-color,transform] duration-300 hover:-translate-y-0.5 hover:border-chocolate-accent/50 hover:text-chocolate-accent"
+              >
+                <Icon className="text-lg" aria-hidden="true" />
+              </a>
+            </li>
+          ))}
+        </ul>
       </div>
     </footer>
   );

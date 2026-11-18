@@ -8,6 +8,10 @@
     --color-chocolate-accent: #d4a76a;
     --color-chocolate-light-accent: #e8d5b5;
 
+    /* Short aliases — the UI layer uses `accent` / `light-accent`. */
+    --color-accent: #d4a76a;
+    --color-light-accent: #e8d5b5;
+
     --font-display: "Bricolage Grotesque", sans-serif;
     --font-body: "Plus Jakarta Sans", sans-serif;
     --font-tech: "Space Grotesk", sans-serif;
@@ -70,9 +74,36 @@ h3,
     position: relative;
 }
 
-@media (min-width: 768px) {
-    * {
-        cursor: none !important;
+/* Custom cursor only when MouseTracker is active (fine pointer, motion allowed). */
+.has-custom-cursor,
+.has-custom-cursor * {
+    cursor: none !important;
+}
+
+.has-custom-cursor input,
+.has-custom-cursor textarea {
+    cursor: text !important;
+}
+
+/* Visible keyboard focus everywhere — the accent ring matches the palette. */
+:focus-visible {
+    outline: 2px solid var(--color-chocolate-accent);
+    outline-offset: 3px;
+    border-radius: 6px;
+}
+
+:focus:not(:focus-visible) {
+    outline: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
     }
 }
 
@@ -90,6 +121,8 @@ h3,
     backdrop-filter: blur(5px);
     -webkit-backdrop-filter: blur(5px);
     position: relative;
+    overflow: hidden; /* keep the hover sweep (::after) inside the card */
+    isolation: isolate;
     border: 1px solid rgba(255, 255, 255, 0.1);
     box-shadow:
         0 4px 24px -1px rgba(0, 0, 0, 0.2),
@@ -193,4 +226,55 @@ h3,
 .glistening-glass:hover .glistening-glass-top-edge {
     opacity: 1;
     animation: top-edge-sweep 3s ease-in-out infinite;
+}
+
+/* While a bento page owns the screen, the site nav steps aside. The nav's
+   transform belongs to framer-motion, so move it with `translate` instead. */
+html[data-bento-open] nav.fixed {
+  translate: 0 -140%;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Project covers — slow, ambient motion on drawn diagrams. */
+@keyframes cover-flow {
+  to {
+    stroke-dashoffset: -90;
+  }
+}
+@keyframes cover-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.cover-flow {
+  animation: cover-flow 6s linear infinite;
+}
+.cover-spin {
+  animation: cover-spin 30s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cover-flow,
+  .cover-spin {
+    animation: none;
+  }
+}
+
+/* Hero scroll cue: a gold tick that drops down its track. */
+@keyframes hero-scroll-dot {
+  0% {
+    transform: translateY(-100%);
+  }
+  70%,
+  100% {
+    transform: translateY(280%);
+  }
+}
+.hero-scroll-dot {
+  animation: hero-scroll-dot 2.2s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-scroll-dot {
+    animation: none;
+  }
 }

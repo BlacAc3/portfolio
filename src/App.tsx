@@ -42,7 +42,7 @@ const App = () => {
       <MouseTracker />
       <Navbar />
 
-      <main className="relative z-10">
+      <main id="main-content" tabIndex={-1} className="relative z-10 outline-none">
         <AnimatePresence mode="wait">
           <Routes location={location} key={location.pathname}>
             <Route
