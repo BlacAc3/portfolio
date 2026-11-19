@@ -98,6 +98,17 @@ const projectsData: Project[] = [
     visual: "site",
     url: "https://oh-gloria.vercel.app/",
   },
+  {
+    id: "8",
+    title: "Emida Properties",
+    description:
+      "Designed and built the website for Emida Properties Ltd., a real estate company, presenting the brand and its property offerings online.",
+    period: "2026",
+    role: "Creative Developer · Client Work",
+    tech: ["React", "Cloudflare"],
+    visual: "site",
+    url: "https://emida.ng",
+  },
 ];
 
 const pad = (n: number) => String(n).padStart(2, "0");
