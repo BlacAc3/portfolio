@@ -37,6 +37,13 @@ interface BentoShowcaseProps {
 }
 
 /**
+ * Cover → page beats, as fractions of the morph. The gap between them is the
+ * blank: just the card's page colour, softly veiled, before content arrives.
+ */
+const COVER_OUT = [0.38, 0.62] as const;
+const PAGE_IN = [0.72, 0.98] as const;
+
+/**
  * Page layer background — the same token the page content paints, so as the
  * cover dissolves it fades into the page's own colour in either theme
  * (a fixed dark fill turned light-mode frames muddy grey mid-morph).
@@ -506,9 +513,10 @@ export default function BentoShowcase({
       const radius = lerp(r0, r1, m) * (1 - easeInOutCubic(seg(frame.morph, 0.86, 1)));
       page.style.clipPath = roundedQuadPath(poly, radius);
 
-      // The page surfaces on the face as the face's own cover (warped onto
-      // its exact corners), which then dissolves through a blur while the
-      // content resolves out of one: a rack-focus rather than a swap.
+      // Three beats, never overlapping: the cover (warped onto the face's exact
+      // corners) blurs away, the growing card holds a beat of soft blank page
+      // colour, then the content resolves out of a blur. Collapse plays the
+      // same beats backwards.
       page.style.opacity = String(easeOutQuart(seg(frame.morph, 0, 0.16)));
       const small = W < 768;
 
@@ -516,7 +524,7 @@ export default function BentoShowcase({
       // resolving page together — so no layer ever reads as a hard swap.
       // Zero on the face and on landing; filter runs before clip-path, so the
       // card's edge stays crisp while what's inside it softens.
-      const veil = Math.sin(Math.PI * seg(frame.morph, 0.05, 0.96)) * (small ? 3 : 5);
+      const veil = Math.sin(Math.PI * seg(frame.morph, COVER_OUT[0], 0.96)) * (small ? 3 : 5);
       const pf = veil > 0.05 ? `blur(${veil.toFixed(2)}px)` : "none";
       if (page.style.filter !== pf) page.style.filter = pf;
 
@@ -529,11 +537,11 @@ export default function BentoShowcase({
 
       const cover = covers[i];
       if (cover) {
-        const c = 1 - easeInOutCubic(seg(frame.morph, 0.2, 0.68));
+        const c = 1 - easeInOutCubic(seg(frame.morph, COVER_OUT[0], COVER_OUT[1]));
         // "inherit", not "visible": a visible child would outlive its hidden page.
         cover.style.visibility = c > 0.001 ? "inherit" : "hidden";
         if (c > 0.001) {
-          const blur = easeInOutCubic(seg(frame.morph, 0.12, 0.68)) * (small ? 8 : 12);
+          const blur = easeInOutCubic(seg(frame.morph, COVER_OUT[0] - 0.04, COVER_OUT[1])) * (small ? 10 : 16);
           cover.style.opacity = String(c);
           cover.style.filter = blur > 0.05 ? `blur(${blur.toFixed(2)}px)` : "none";
           cover.style.width = `${W}px`;
@@ -568,18 +576,17 @@ export default function BentoShowcase({
       const titleEl = titleEls[i];
       const tb = fly && fb ? coverTitleBox(i, isPortraitView(W, H)) : null;
       if (fly && fb && titleEl) {
-        const on = !!tb && frame.morph < 0.999;
-        // Landing: the flyer dissolves into the real headline instead of
-        // swapping on the last frame (sub-pixel and hinting differences
-        // between the two made that swap visibly jump).
-        const hand = on ? easeInOutCubic(seg(frame.morph, 0.78, 0.97)) : 1;
-        fly.style.visibility = on && hand < 0.999 ? "inherit" : "hidden";
-        titleEl.style.visibility = on && hand <= 0.001 ? "hidden" : "";
-        titleEl.style.opacity = on ? hand.toFixed(3) : "";
-        const tblur = on ? (1 - hand) * (small ? 3 : 5) : 0;
-        titleEl.style.filter = tblur > 0.05 ? `blur(${tblur.toFixed(2)}px)` : "";
+        // The cover's headline drifts toward its place in the page but fades
+        // out with the cover; the real headline arrives with the content.
+        const gone = easeInOutCubic(seg(frame.morph, COVER_OUT[0], COVER_OUT[1]));
+        const on = !!tb && gone < 0.999;
+        const hand = gone;
+        fly.style.visibility = on ? "inherit" : "hidden";
+        titleEl.style.visibility = "";
+        titleEl.style.opacity = "";
+        titleEl.style.filter = "";
         if (on && tb) {
-          const k = easeInOutCubic(seg(frame.morph, 0.04, 0.9));
+          const k = easeInOutCubic(seg(frame.morph, 0.04, 0.9)) * 0.35;
           const from = [
             projectUV(poly, tb.u, tb.v),
             projectUV(poly, tb.u + tb.w, tb.v),
@@ -597,7 +604,7 @@ export default function BentoShowcase({
           ];
           // A slight in-flight blur: zero on the face and on landing, so both
           // ends stay crisp, softest mid-travel when the text moves fastest.
-          const fb2 = Math.sin(Math.PI * k) * (small ? 3 : 5) + hand * (small ? 3 : 5);
+          const fb2 = hand * (small ? 10 : 16);
           fly.style.opacity = (1 - hand).toFixed(3);
           const ink = flyInk[i];
           const ck = easeInOutCubic(seg(frame.morph, 0.2, 0.8));
@@ -611,8 +618,8 @@ export default function BentoShowcase({
         }
       }
 
-      const reveal = easeOutQuart(seg(frame.morph, 0.3, 0.95));
-      const unblur = (1 - reveal) * (small ? 8 : 14);
+      const reveal = easeInOutCubic(seg(frame.morph, PAGE_IN[0], PAGE_IN[1]));
+      const unblur = (1 - reveal) * (small ? 10 : 16);
       content.style.opacity = String(reveal);
       content.style.filter = unblur > 0.05 ? `blur(${unblur.toFixed(2)}px)` : "none";
       content.style.transform = `translate3d(0,${((1 - reveal) * 28).toFixed(1)}px,0) scale(${(1 + (1 - reveal) * 0.035).toFixed(4)})`;

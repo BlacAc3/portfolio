@@ -42,7 +42,7 @@ const BEAT = {
   hero: 0.9,
   intro: 1.5,
   dive: 0.55,
-  expand: 0.45,
+  expand: 0.75, // grow crisp, fade the cover, a blank beat, then the page
   readLead: 0.3, // settle on the page's first screen before it scrolls
   readHold: 0.2, // dwell on the last screen before it closes
   collapse: 0.4,

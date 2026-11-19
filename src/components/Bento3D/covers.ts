@@ -412,11 +412,7 @@ function paint(canvas: HTMLCanvasElement, index: number, portrait: boolean, with
   c.fillRect(0, 0, W, H);
 
   if (cell.coverTitle) {
-    // The motif steps back to a faint backdrop; the headline is the cover.
-    c.save();
-    c.globalAlpha = cell.theme === "accent" ? 0.26 : 0.17;
-    motifs[cell.id]?.(c, W, H, Math.min(W, H));
-    c.restore();
+    // A clean face: the headline alone is the cover, with no motif behind it.
     if (withTitle) drawTitle(c, index, portrait);
   } else {
     motifs[cell.id]?.(c, W, H, Math.min(W, H));
