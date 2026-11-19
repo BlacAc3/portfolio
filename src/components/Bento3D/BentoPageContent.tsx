@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { preloadJourney } from "../Journey/loading";
 import { HiArrowRight } from "react-icons/hi2";
 import me from "../../assets/me.webp";
 import type { BentoCell } from "./bentoData";
@@ -282,6 +283,7 @@ const BentoPageContent = ({
             {page.cta && (
               <Link
                 to={page.cta.to}
+                onPointerEnter={page.cta.to === "/about" ? () => void preloadJourney() : undefined}
                 className={`group inline-flex items-center gap-3 rounded-full px-7 py-4 font-tech text-[11px] font-bold uppercase tracking-[0.25em] transition-transform duration-300 hover:scale-[1.03] ${
                   bright
                     ? "bg-canvas text-accent-soft"

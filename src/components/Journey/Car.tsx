@@ -1,3 +1,5 @@
+// First: counts the model requests the preloads below send.
+import "./loadTracker";
 import { Suspense, useEffect, useMemo, useRef, type ReactNode } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Html, useGLTF } from "@react-three/drei";
@@ -232,6 +234,12 @@ interface CarProps {
   shape?: BodyShape;
   /** Engine, frame, seats, labels: only the hero car needs them. */
   hero?: boolean;
+  /**
+   * The part labels (drei <Html>, each its own React root). Off when this car
+   * is only the stand-in while the 812 loads: the loader hides it anyway, and
+   * unmounting those roots mid-commit trips React's removeChild.
+   */
+  labels?: boolean;
 }
 
 const WHEELS: [number, number][] = [
@@ -241,7 +249,7 @@ const WHEELS: [number, number][] = [
   [CAR.rearAxle, -1],
 ];
 
-export const ProceduralCar = ({ ctl, color = ROSSO, shape = GT_SHAPE, hero = false }: CarProps) => {
+export const ProceduralCar = ({ ctl, color = ROSSO, shape = GT_SHAPE, hero = false, labels = hero }: CarProps) => {
   const body = useMemo(() => buildBody(shape), [shape]);
   const paint = useMemo(() => paintMat(color), [color]);
   const zebra = useMemo(() => zebraMat(), []);
@@ -341,7 +349,7 @@ export const ProceduralCar = ({ ctl, color = ROSSO, shape = GT_SHAPE, hero = fal
             <cylinderGeometry args={[0.045, 0.05, 0.12, 16]} />
           </mesh>
         ))}
-        {hero && (
+        {labels && (
           <PartLabel position={[-0.4, 1.5, 0]} labelRef={(el) => (labelRefs.current[3] = el)}>
             Bodywork: active aero flaps
           </PartLabel>
@@ -365,9 +373,11 @@ export const ProceduralCar = ({ ctl, color = ROSSO, shape = GT_SHAPE, hero = fal
         <>
           <group ref={engineRef} position={[0.75, 0.32, 0]}>
             <Engine />
-            <PartLabel position={[0, 0.75, 0]} labelRef={(el) => (labelRefs.current[0] = el)}>
-              6.5 L V12, 800 cv
-            </PartLabel>
+            {labels && (
+              <PartLabel position={[0, 0.75, 0]} labelRef={(el) => (labelRefs.current[0] = el)}>
+                6.5 L V12, 800 cv
+              </PartLabel>
+            )}
           </group>
           <mesh ref={shaftRef} material={steel} position={[-0.3, 0.33, 0]} rotation-z={Math.PI / 2}>
             <cylinderGeometry args={[0.05, 0.05, 2.2, 12]} />
@@ -379,9 +389,11 @@ export const ProceduralCar = ({ ctl, color = ROSSO, shape = GT_SHAPE, hero = fal
             <mesh material={steel} rotation-x={Math.PI / 2}>
               <cylinderGeometry args={[0.07, 0.07, 1.4, 12]} />
             </mesh>
-            <PartLabel position={[0, 0.5, 0]} labelRef={(el) => (labelRefs.current[1] = el)}>
-              7-speed dual-clutch transaxle
-            </PartLabel>
+            {labels && (
+              <PartLabel position={[0, 0.5, 0]} labelRef={(el) => (labelRefs.current[1] = el)}>
+                7-speed dual-clutch transaxle
+              </PartLabel>
+            )}
           </group>
           <group ref={seatsRef} position={[-0.55, 0.24, 0]}>
             <group position-z={0.36}>
@@ -399,7 +411,7 @@ export const ProceduralCar = ({ ctl, color = ROSSO, shape = GT_SHAPE, hero = fal
           </group>
           {/* The brake label rides on the front-left wheel's spot. */}
           <group position={[CAR.frontAxle, 0, 0]}>
-            <BrakeLabel ctl={ctl} labelRef={(el) => (labelRefs.current[2] = el)} />
+            {labels && <BrakeLabel ctl={ctl} labelRef={(el) => (labelRefs.current[2] = el)} />}
           </group>
         </>
       )}
@@ -766,7 +778,7 @@ export const HeroCar = ({ ctl }: { ctl: CarControl }) => {
   });
   if (!CAR_MODEL.url) return <ProceduralCar ctl={ctl} hero />;
   return (
-    <Suspense fallback={<ProceduralCar ctl={ctl} hero />}>
+    <Suspense fallback={<ProceduralCar ctl={ctl} hero labels={false} />}>
       <group ref={ref}>
         <Car812 ctl={ctl} />
       </group>

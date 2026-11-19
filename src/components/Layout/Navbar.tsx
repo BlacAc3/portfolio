@@ -1,9 +1,16 @@
 import { useState, useEffect, type MouseEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { preloadJourney } from "../Journey/loading";
 import { jumpTo } from "../../lib/jump";
 import { RiMenu4Line, RiCloseLine } from "react-icons/ri";
 import ThemeToggle from "./ThemeToggle";
+
+/** Hovering or focusing About starts loading the 3D drive's models. */
+const aboutIntent = {
+  onPointerEnter: () => void preloadJourney(),
+  onFocus: () => void preloadJourney(),
+};
 
 const navLinks = [
   { name: "Home", href: "/" },
@@ -143,6 +150,7 @@ const Navbar = () => {
                       to={link.href}
                       aria-current={active ? "page" : undefined}
                       onClick={homeJump(link.href)}
+                      {...(link.href === "/about" ? aboutIntent : {})}
                       className={`text-[11px] lg:text-xs uppercase tracking-[0.2em] font-bold transition-colors relative group py-2 ${
                         active
                           ? "text-accent"
@@ -213,6 +221,7 @@ const Navbar = () => {
                       to={link.href}
                       aria-current={active ? "page" : undefined}
                       onClick={homeJump(link.href)}
+                      {...(link.href === "/about" ? aboutIntent : {})}
                       className={`text-4xl font-black uppercase tracking-tighter transition-colors ${
                         active
                           ? "text-accent"

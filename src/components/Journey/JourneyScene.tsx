@@ -4,6 +4,8 @@ import { PerformanceMonitor } from "@react-three/drei";
 import * as THREE from "three";
 import type { Theme } from "../../contexts/ThemeContext";
 import { StudioLights } from "../Three/shared";
+import { journeyLoad } from "./loading";
+import { loadsPending, onLoadsIdle } from "./loadTracker";
 import { HeroCar } from "./Car";
 import { desktopTexture } from "./desktop";
 import { direct, shotAt } from "./director";
@@ -104,7 +106,9 @@ const Director = ({
 const Warmup = () => {
   const { gl, scene, camera } = useThree();
   useEffect(() => {
+    journeyLoad.set({ ready: false });
     let raf = 0;
+    let alive = true;
     const run = () => {
       const hidden: THREE.Object3D[] = [];
       const textures = new Set<THREE.Texture>();
@@ -121,9 +125,14 @@ const Warmup = () => {
               textures.add(v as THREE.Texture);
       });
       // compileAsync builds the programs synchronously, then waits on the driver.
-      gl.compileAsync(scene, camera).catch(() => {});
+      const compiled = gl.compileAsync(scene, camera).catch(() => {});
       for (const o of hidden) o.visible = false;
       textures.forEach((t) => gl.initTexture(t));
+      // Ready once nothing is left to load and the last compile has finished.
+      if (!loadsPending())
+        compiled.then(() => {
+          if (alive && !loadsPending()) journeyLoad.set({ ready: true });
+        });
     };
     const schedule = () => {
       cancelAnimationFrame(raf);
@@ -131,15 +140,12 @@ const Warmup = () => {
       raf = requestAnimationFrame(() => (raf = requestAnimationFrame(run)));
     };
     schedule();
-    const mgr = THREE.DefaultLoadingManager;
-    const prev = mgr.onLoad;
-    mgr.onLoad = () => {
-      prev?.();
-      schedule();
-    };
+    const off = onLoadsIdle(schedule);
     return () => {
+      alive = false;
       cancelAnimationFrame(raf);
-      mgr.onLoad = prev;
+      off();
+      journeyLoad.set({ ready: false });
     };
   }, [gl, scene, camera]);
   return null;

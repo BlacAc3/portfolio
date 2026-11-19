@@ -10,8 +10,10 @@ import { N, STARTS, STOPS, chapterAt, readU, spanOf, veilAt } from "./timeline";
 import { pauseParticles } from "../magicui/particles";
 import JourneyStatic from "./JourneyStatic";
 import { journey, window4 } from "./state";
+import { preloadJourney } from "./loading";
+import JourneyLoader from "./JourneyLoader";
 
-const JourneyScene = lazy(() => import("./JourneyScene"));
+const JourneyScene = lazy(preloadJourney);
 
 /** Scroll per chapter, in viewport heights. */
 const PER_CHAPTER = 1.4;
@@ -171,6 +173,9 @@ const Drive = () => {
     jumpTo(st.start + (readU(c) / N) * (st.end - st.start));
   };
 
+  // Start fetching the scene and its models straight away.
+  useEffect(() => void preloadJourney(), []);
+
   // Mount the scene a screen early; only render frames while on screen.
   useEffect(() => {
     const el = section.current;
@@ -298,6 +303,8 @@ const Drive = () => {
               </Suspense>
             )}
           </div>
+
+          <JourneyLoader />
 
           {/* Scrims keep the copy readable over the scene. */}
           <div

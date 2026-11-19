@@ -1,3 +1,5 @@
+// First: counts the model requests the preloads below send.
+import "./loadTracker";
 import { Suspense, useEffect, useMemo, useRef } from "react";
 import { useGLTF } from "@react-three/drei";
 import { useFrame, useThree } from "@react-three/fiber";

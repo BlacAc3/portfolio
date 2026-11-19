@@ -1,3 +1,5 @@
+// First: counts the model requests the preloads below send.
+import "./loadTracker";
 import {
   Suspense,
   useEffect,
