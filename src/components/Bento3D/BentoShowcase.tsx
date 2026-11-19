@@ -286,6 +286,7 @@ export default function BentoShowcase({
     const heroBg = stage.querySelector<HTMLElement>("[data-hero-bg]");
     const heroStars = stage.querySelector<HTMLElement>("[data-hero-stars]");
     const peekEl = stage.querySelector<HTMLButtonElement>("[data-peek]");
+    const heroSlot = stage.querySelector<HTMLElement>("[data-hero-box]");
     const covers = q<HTMLImageElement>("[data-cover]");
     const canvasWrap = stage.querySelector<HTMLElement>("[data-canvas]");
     const jumpBtns = q<HTMLButtonElement>("[data-jump]");
@@ -320,6 +321,10 @@ export default function BentoShowcase({
     /* Hover / tap on the resting box → the scene's peek spring. */
     const input: SceneInput = { peek: 0, kicks: 0 };
     let tapTimer = 0;
+    let tapPointer = "";
+    const onDown = (e: PointerEvent) => {
+      tapPointer = e.pointerType;
+    };
     const onEnter = (e: PointerEvent) => {
       if (e.pointerType === "mouse") input.peek = 1;
     };
@@ -330,10 +335,18 @@ export default function BentoShowcase({
       input.kicks += 1;
       input.peek = 1;
       window.clearTimeout(tapTimer);
-      tapTimer = window.setTimeout(() => {
-        if (!peekEl?.matches(":hover")) input.peek = 0;
-      }, 1500);
+      // A mouse keeps it open while it hovers. Touch has no real hover
+      // (phones leave :hover stuck on the last thing tapped), so a tap
+      // always lets the lid fall shut again after a short beat.
+      const mouse = tapPointer === "mouse";
+      tapTimer = window.setTimeout(
+        () => {
+          if (!(mouse && peekEl?.matches(":hover"))) input.peek = 0;
+        },
+        mouse ? 1500 : 900,
+      );
     };
+    peekEl?.addEventListener("pointerdown", onDown);
     peekEl?.addEventListener("pointerenter", onEnter);
     peekEl?.addEventListener("pointerleave", onLeave);
     peekEl?.addEventListener("click", onTap);
@@ -406,7 +419,23 @@ export default function BentoShowcase({
       });
     };
 
+    const measureSlot = () => {
+      input.slot = heroSlot
+        ? { ...offsetWithin(heroSlot, stage), w: heroSlot.offsetWidth, h: heroSlot.offsetHeight }
+        : null;
+      // The warm pool of light follows the box to wherever the slot is.
+      const sl = input.slot;
+      if (heroBg && sl && heroBg.offsetHeight > 0) {
+        const px = ((sl.x + sl.w / 2) / stage.clientWidth) * 100;
+        const py = ((sl.y + sl.h * 0.62 - heroBg.offsetTop) / heroBg.offsetHeight) * 100;
+        heroBg.style.setProperty("--pool-x", `${px.toFixed(1)}%`);
+        heroBg.style.setProperty("--pool-y", `${Math.min(95, Math.max(5, py)).toFixed(1)}%`);
+      }
+      lastKey = "";
+    };
+
     const measure = () => {
+      measureSlot();
       measureTitles();
       const v = stage.clientHeight;
       const heights = scrollers.map((s) => s.offsetHeight);
@@ -422,6 +451,7 @@ export default function BentoShowcase({
     measure();
     const ro = new ResizeObserver(measure);
     ro.observe(stage);
+    if (heroSlot) ro.observe(heroSlot);
     scrollers.forEach((s) => ro.observe(s));
     document.fonts?.ready.then(measure);
     // Theme flips change the headline colour (and nothing else): re-measure
@@ -753,6 +783,7 @@ export default function BentoShowcase({
     io.observe(section);
 
     return () => {
+      peekEl?.removeEventListener("pointerdown", onDown);
       peekEl?.removeEventListener("pointerenter", onEnter);
       peekEl?.removeEventListener("pointerleave", onLeave);
       peekEl?.removeEventListener("click", onTap);
@@ -804,7 +835,7 @@ export default function BentoShowcase({
           </div>
           <div
             data-hero-bg
-            className="absolute inset-x-0 bottom-0 h-[70%] bg-[radial-gradient(ellipse_50%_38%_at_50%_76%,rgb(var(--accent-rgb)/0.3),transparent_70%)]"
+            className="absolute inset-x-0 bottom-0 h-[70%] bg-[radial-gradient(ellipse_50%_38%_at_var(--pool-x,50%)_var(--pool-y,76%),rgb(var(--accent-rgb)/0.3),transparent_70%)]"
           />
         </div>
 

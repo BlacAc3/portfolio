@@ -104,7 +104,7 @@ const Navbar = () => {
         aria-label="Primary"
         initial={{ y: -100 }}
         animate={{ y: 0 }}
-        className={`fixed top-0 w-full z-50 transition-all duration-500 px-4 md:px-6 ${
+        className={`fixed top-0 w-full z-50 transition-all duration-500 px-4 md:px-6 compact:py-3 short:py-2 ${
           isScrolled ? "py-3" : "py-6"
         }`}
       >

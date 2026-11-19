@@ -5,6 +5,11 @@
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 @custom-variant light (&:where([data-theme="light"], [data-theme="light"] *));
 
+/* Screen-height variants for phones: `compact:` is a short portrait screen
+   (an SE-sized phone), `short:` a phone turned on its side. */
+@custom-variant compact (@media (orientation: portrait) and (max-height: 720px));
+@custom-variant short (@media (orientation: landscape) and (max-height: 520px));
+
 /*
  * Semantic colour tokens. Utilities (bg-canvas, text-ink/70, border-ink/10…)
  * read these variables at runtime, so swapping the values under

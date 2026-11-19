@@ -141,6 +141,12 @@ export interface SceneInput {
   peek: number;
   /** Increments on every click/tap — each one kicks the lid. */
   kicks: number;
+  /**
+   * The free space the hero layout leaves for the resting box, in stage
+   * pixels. The box is sized and centred into it, so the copy never
+   * collides with it on short or narrow screens.
+   */
+  slot?: { x: number; y: number; w: number; h: number } | null;
 }
 
 export interface SceneOutput {
@@ -377,6 +383,7 @@ const BentoBox = ({ api }: { api: RefObject<BentoSceneHandle | null> }) => {
     const render = (frame: Frame, timeMs: number, input: SceneInput): SceneOutput => {
       const state = get();
       const { camera, size: view } = state;
+      const cam = camera as THREE.PerspectiveCamera;
       const dt = Math.min(0.1, Math.max(0, (timeMs - s.last) / 1000));
       s.last = timeMs;
       const t = timeMs / 1000;
@@ -479,8 +486,38 @@ const BentoBox = ({ api }: { api: RefObject<BentoSceneHandle | null> }) => {
         // Sized to sit between the hero's bottom-row columns, and raised so
         // its base clears them (it centres in the band under the headline).
         const fill = isPortrait ? 0.74 : aspect < 1.25 ? 0.5 : 0.32;
-        const dist = OUTER_W / 2 / (fill * TAN_HALF * aspect);
-        const lift = (isPortrait ? 0.44 : 0.4) * TAN_HALF * dist;
+        let dist = OUTER_W / 2 / (fill * TAN_HALF * aspect);
+        // Where the box's centre sits, in NDC (+y is down the screen).
+        const rest = isPortrait ? 0.44 : 0.4;
+        let ndcX = 0;
+        let ndcY = rest;
+        const slot = input.slot;
+        if (slot && slot.w > 40 && slot.h > 40) {
+          // Pixels per world unit at the box: as large as the default, but
+          // shrunk so the box (with a little headroom for the float and the
+          // peek) fits inside the slot on both axes.
+          const maxPx = (fill * view.width) / OUTER_W;
+          const tall = TRAY_H + LID_H + 0.3;
+          const px = Math.min(maxPx, (slot.w * 0.92) / OUTER_W, (slot.h * 0.8) / tall);
+          dist = view.height / 2 / (px * TAN_HALF);
+          ndcX = ((slot.x + slot.w / 2) / view.width) * 2 - 1;
+          ndcY = ((slot.y + slot.h / 2) / view.height) * 2 - 1;
+        }
+        // Aiming the camera above the box puts it low on screen *and* keeps
+        // the view looking slightly down onto the lid. Anything past that
+        // (a slot higher up, or off to the side) is a shift of the
+        // projection instead, so the box never turns to show its underside.
+        const aim = Math.max(ndcY, rest);
+        const lift = aim * TAN_HALF * dist;
+        const off = 1 - heroT;
+        cam.setViewOffset(
+          view.width,
+          view.height,
+          (-ndcX * view.width * off) / 2,
+          (-(ndcY - aim) * view.height * off) / 2,
+          view.width,
+          view.height,
+        );
         s.heroLook.set(0, 0.42 + lift * Math.cos(EL), -lift * Math.sin(EL));
         s.heroCam.set(0, 0.42 + dist * Math.sin(EL), dist * Math.cos(EL));
         s.heroCam.add(s.heroLook).sub(s.bound.set(0, 0.42, 0));
@@ -489,6 +526,7 @@ const BentoBox = ({ api }: { api: RefObject<BentoSceneHandle | null> }) => {
         s.cam.lerpVectors(s.heroCam, s.introCam, heroT);
         s.look.lerpVectors(s.heroLook, s.introLook, heroT);
       } else if (frame.phase === "intro") {
+        if (cam.view?.enabled) cam.clearViewOffset();
         const a = smooth(range(introT, 0, INTRO.revealStart));
         const b = smooth(range(introT, INTRO.revealStart, 1));
         s.cam.lerpVectors(s.camStart, s.camMid, a);
@@ -497,6 +535,7 @@ const BentoBox = ({ api }: { api: RefObject<BentoSceneHandle | null> }) => {
           .set(0, 0.35 + lidFrame * 0.9, -lidFrame * 1.1)
           .lerp(s.overviewLook, b);
       } else {
+        if (cam.view?.enabled) cam.clearViewOffset();
         s.cam.copy(s.wide);
         s.look.copy(s.overviewLook);
         if (frame.phase === "outro") {
@@ -615,12 +654,14 @@ const BentoBox = ({ api }: { api: RefObject<BentoSceneHandle | null> }) => {
         position-y={TRAY_H / 2}
         material={shell.tray}
       />
-      {/* Gold pin-line along the tray rim */}
+      {/* Gold pin-line along the tray rim. Its top sits a hair above the
+          tray's top face: if the two were coplanar they'd z-fight and the
+          rim would flicker in stripes as the box moves. */}
       <RoundedBox
         args={[OUTER_W + 0.012, 0.022, OUTER_D + 0.012]}
         radius={0.011}
         smoothness={3}
-        position-y={TRAY_H - 0.011}
+        position-y={TRAY_H - 0.009}
         material={shell.gold}
       />
       {/* Second pin-line at the foot: frames the tray's base against the page */}
@@ -643,7 +684,7 @@ const BentoBox = ({ api }: { api: RefObject<BentoSceneHandle | null> }) => {
         <mesh
           key={`slot-${bentoCells[i].id}`}
           rotation-x={-Math.PI / 2}
-          position={[g.x, TRAY_H + 0.0115, g.z]}
+          position={[g.x, TRAY_H + 0.013, g.z]}
           material={shell.slot}
           geometry={slotShapes[i]}
         />
