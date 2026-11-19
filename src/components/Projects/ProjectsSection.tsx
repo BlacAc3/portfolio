@@ -1,14 +1,16 @@
 import {
+  AnimatePresence,
   motion,
   useReducedMotion,
   useScroll,
   useTransform,
   type MotionValue,
 } from "framer-motion";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import jobApi from "../../assets/jobApi.webp";
 
-type Visual = "schema" | "rbac" | "image" | "terminal" | "mesh";
+type Visual = "schema" | "rbac" | "image" | "terminal" | "mesh" | "site";
 
 interface Project {
   id: string;
@@ -19,6 +21,7 @@ interface Project {
   tech: string[];
   visual: Visual;
   image?: string;
+  url?: string;
 }
 
 const projectsData: Project[] = [
@@ -72,6 +75,28 @@ const projectsData: Project[] = [
     role: "Open Source",
     tech: ["libp2p", "Decentralized Networks"],
     visual: "mesh",
+  },
+  {
+    id: "6",
+    title: "Ibukun Odedele — Portfolio",
+    description:
+      "Designed and built a portfolio site for a Lagos-based content creator and videographer, giving her work and her café lifestyle magazine, One Sip at a Time, a home of their own.",
+    period: "2026",
+    role: "Creative Developer · Client Work",
+    tech: ["React", "Vercel"],
+    visual: "site",
+    url: "https://ibukun-odedele.vercel.app/",
+  },
+  {
+    id: "7",
+    title: "Glory Bamgboye — Portfolio",
+    description:
+      "Designed and built a personal site for a brand and content storyteller, presenting her story and work in a clean, editorial layout.",
+    period: "2026",
+    role: "Creative Developer · Client Work",
+    tech: ["React", "Vercel"],
+    visual: "site",
+    url: "https://oh-gloria.vercel.app/",
   },
 ];
 
@@ -191,6 +216,134 @@ const MeshCover = () => {
   );
 };
 
+const hostOf = (url?: string) => url?.replace(/^https?:\/\//, "").replace(/\/$/, "");
+
+/** Live, scaled-down iframe of a real site. Click to zoom into the full site. */
+const SiteCover = ({ url, title }: { url?: string; title: string }) => {
+  const boxRef = useRef<HTMLButtonElement>(null);
+  const [scale, setScale] = useState(0.4);
+  const [open, setOpen] = useState(false);
+  const [from, setFrom] = useState<DOMRect | null>(null);
+
+  useEffect(() => {
+    const el = boxRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(() => setScale(el.clientWidth / 1280));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+    window.addEventListener("keydown", onKey);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prev;
+    };
+  }, [open]);
+
+  if (!url) return null;
+  const reduced = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const r = from;
+  const vw = typeof window !== "undefined" ? window.innerWidth : 1280;
+  const vh = typeof window !== "undefined" ? window.innerHeight : 800;
+  const pad = vw < 640 ? 0 : 24;
+
+  return (
+    <>
+      <button
+        ref={boxRef}
+        type="button"
+        onClick={() => {
+          setFrom(boxRef.current?.getBoundingClientRect() ?? null);
+          setOpen(true);
+        }}
+        aria-label={`Open live preview of ${title}`}
+        className="group/site relative flex h-full w-full cursor-zoom-in flex-col overflow-hidden rounded-2xl border border-ink/10 bg-[#0d0c0b] text-left"
+      >
+        <div className="flex items-center gap-1.5 border-b border-ink/10 px-4 py-2.5">
+          <span className="h-2 w-2 rounded-full bg-ink/20" />
+          <span className="h-2 w-2 rounded-full bg-ink/20" />
+          <span className="h-2 w-2 rounded-full bg-accent/70" />
+          <span className="ml-3 truncate rounded-full bg-ink/5 px-3 py-0.5 font-tech text-[10px] tracking-[0.15em] text-ink/45">
+            {hostOf(url)}
+          </span>
+        </div>
+        <div className="relative flex-1 overflow-hidden bg-black">
+          <iframe
+            src={url}
+            title={`${title} preview`}
+            loading="lazy"
+            tabIndex={-1}
+            aria-hidden="true"
+            style={{ width: 1280, height: 900, transform: `scale(${scale})`, transformOrigin: "top left" }}
+            className="pointer-events-none absolute left-0 top-0 border-0"
+          />
+          <span className="absolute bottom-3 right-3 rounded-full bg-canvas/85 px-3 py-1.5 font-tech text-[10px] font-bold uppercase tracking-[0.25em] text-ink opacity-0 backdrop-blur transition-opacity group-hover/site:opacity-100 group-focus-visible/site:opacity-100">
+            Click to explore ↗
+          </span>
+        </div>
+      </button>
+
+      {createPortal(
+        <AnimatePresence>
+          {open && r && (
+            <>
+              <motion.div
+                key="scrim"
+                className="fixed inset-0 z-[200] bg-black/80 backdrop-blur-sm"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setOpen(false)}
+              />
+              <motion.div
+                key="panel"
+                role="dialog"
+                aria-modal="true"
+                aria-label={`${title} live site`}
+                data-lenis-prevent
+                className="fixed z-[201] flex flex-col overflow-hidden border border-ink/15 bg-[#0d0c0b] shadow-2xl"
+                initial={{ left: r.left, top: r.top, width: r.width, height: r.height, borderRadius: 16 }}
+                animate={{ left: pad, top: pad, width: vw - pad * 2, height: vh - pad * 2, borderRadius: pad ? 20 : 0 }}
+                exit={{ left: r.left, top: r.top, width: r.width, height: r.height, borderRadius: 16 }}
+                transition={reduced ? { duration: 0 } : { duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <div className="flex shrink-0 items-center gap-3 border-b border-ink/10 px-4 py-2.5">
+                  <button
+                    type="button"
+                    onClick={() => setOpen(false)}
+                    aria-label="Close preview"
+                    className="grid h-7 w-7 place-items-center rounded-full bg-ink/10 text-ink transition-colors hover:bg-accent hover:text-canvas"
+                  >
+                    ✕
+                  </button>
+                  <span className="min-w-0 flex-1 truncate rounded-full bg-ink/5 px-4 py-1 font-tech text-[11px] tracking-[0.15em] text-ink/60">
+                    {hostOf(url)}
+                  </span>
+                  <a
+                    href={url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-tech text-[11px] font-bold uppercase tracking-[0.2em] text-accent hover:underline"
+                  >
+                    New tab ↗
+                  </a>
+                </div>
+                <iframe src={url} title={`${title} live site`} className="h-full w-full flex-1 border-0 bg-white" />
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>,
+        document.body,
+      )}
+    </>
+  );
+};
+
 const Cover = ({ project }: { project: Project }) => {
   if (project.visual === "image" && project.image) {
     return (
@@ -210,7 +363,9 @@ const Cover = ({ project }: { project: Project }) => {
     );
   }
   const inner =
-    project.visual === "schema" ? (
+    project.visual === "site" ? (
+      <SiteCover url={project.url} title={project.title} />
+    ) : project.visual === "schema" ? (
       <SchemaCover />
     ) : project.visual === "rbac" ? (
       <RbacCover />
@@ -274,6 +429,16 @@ const Card = ({
             <p className="mt-6 max-w-[48ch] text-[0.95rem] leading-relaxed text-ink/70">
               {project.description}
             </p>
+            {project.url && (
+              <a
+                href={project.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-6 inline-flex w-fit items-center gap-2 font-tech text-[11px] font-bold uppercase tracking-[0.25em] text-ink underline decoration-accent decoration-2 underline-offset-8 transition-colors hover:text-accent"
+              >
+                Visit live site <span aria-hidden="true">↗</span>
+              </a>
+            )}
             <ul aria-label="Technologies" className="mt-auto flex flex-wrap gap-2 pt-8">
               {project.tech.map((t) => (
                 <li

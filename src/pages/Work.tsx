@@ -40,9 +40,10 @@ const Work = () => {
             </p>
             <dl className="mt-10 flex flex-wrap gap-x-10 gap-y-6 border-t border-ink/10 pt-6">
               {[
-                ["05", "Projects"],
+                ["07", "Projects"],
                 ["03", "Production systems"],
                 ["02", "Teams"],
+                ["02", "Client sites"],
               ].map(([value, label]) => (
                 <div key={label}>
                   <dt className="sr-only">{label}</dt>
