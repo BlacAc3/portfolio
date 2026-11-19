@@ -9,8 +9,12 @@
  *          corner. The incoming one (the sun), opposite it, comes in from the
  *          right and rises to the top-right. Its light reveals
  *          the new theme around it; the bottom-left is still the old theme.
- *   exit   a short rest, then the two bodies glide out by
- *          opposite corners while the new theme floods the screen.
+ *   wait   they overshoot their marks a touch, bounce back and settle.
+ *   exit   a small wind-up, then they shoot out by opposite corners while
+ *          the new theme floods the screen.
+ *
+ * Fast in, wait, fast out. The bodies stretch slightly along their direction
+ * of travel, in proportion to their speed, so they read as soft and springy.
  *
  * Layering (View Transitions API): the bodies are separate named elements
  * painted *behind* the app (`#root` is named too). So they sit in the
@@ -23,9 +27,11 @@
 
 export type CelestialBody = "sun" | "moon";
 
-const TURN = 1450; // slide in from the sides and one short, even turn
-const HOLD = 250; // a short rest at the top-right
-const EXIT = 750;
+const TURN = 800; // fast in, overshooting its mark a little
+const HOLD = 480; // bounce back, settle, wait
+const EXIT = 620; // a small wind-up, then fast out
+/** Most a body stretches along its path, at top speed (0.1 = 10%). */
+const STRETCH = 0.1;
 const TOTAL = TURN + HOLD + EXIT;
 const STEP = 1000 / 60;
 /** Must match the solid stop in the mask gradients (index.css). */
@@ -35,10 +41,24 @@ const DEG = Math.PI / 180;
 let running = false;
 export const isCelestialRunning = () => running;
 
-/** Gentle ease-in-out for the turn, with a soft settle of a degree or two. */
+/**
+ * The turn: starts at speed (they slide in from off screen), overshoots the
+ * mark and comes back to it; past t = 1 a small damped bounce settles it.
+ */
 const turnEase = (t: number) => {
-  const base = 0.5 - 0.5 * Math.cos(Math.PI * Math.min(1, Math.max(0, t)));
-  return base + 0.012 * Math.sin(Math.PI * smooth(0.72, 1, t));
+  if (t <= 1) {
+    const c1 = 1.5;
+    const u = t - 1;
+    return 1 + (c1 + 1) * u * u * u + c1 * u * u;
+  }
+  const since = (t - 1) * TURN;
+  return 1 - 0.035 * Math.sin((2 * Math.PI * since) / 300) * Math.exp(-since / 140);
+};
+
+/** The exit: a small wind-up backwards, then away fast. */
+const exitEase = (t: number) => {
+  const c1 = 1.1;
+  return (c1 + 1) * t * t * t - c1 * t * t;
 };
 
 const easeInOutCubic = (t: number) =>
@@ -50,6 +70,13 @@ const smooth = (a: number, b: number, t: number) => {
 };
 
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+
+/** Stretch along `angle` (radians), keeping the area: squash across it. */
+const stretchAlong = (angle: number, k: number) => {
+  const deg = (angle / DEG).toFixed(1);
+  const sx = 1 + k;
+  return `rotate(${deg}deg) scale(${sx.toFixed(4)}, ${(1 / sx).toFixed(4)}) rotate(${-deg}deg)`;
+};
 
 /**
  * The orb elements rest this far off the left edge. Their view-transition
@@ -130,8 +157,18 @@ export function celestialTransition(incoming: CelestialBody, commit: () => void)
   const app = document.getElementById("root");
   const box = app?.getBoundingClientRect() ?? { left: 0, top: 0 };
 
-  type F = { root: Keyframe; pageNew: Keyframe; pageOld: Keyframe; inOrb: Keyframe; outOrb: Keyframe };
+  type F = {
+    root: Keyframe;
+    pageNew: Keyframe;
+    pageOld: Keyframe;
+    inOrb: Keyframe;
+    outOrb: Keyframe;
+    inShape: Keyframe;
+    outShape: Keyframe;
+  };
   const frames: F[] = [];
+  const pathA: { x: number; y: number }[] = [];
+  const pathB: { x: number; y: number }[] = [];
   for (let ms = 0; ms <= TOTAL + 0.5; ms += STEP) {
     let a: { x: number; y: number }, b: { x: number; y: number }, r: number;
     if (ms <= TURN + HOLD) {
@@ -147,10 +184,10 @@ export function celestialTransition(incoming: CelestialBody, commit: () => void)
       r = lerp(halo * smooth(0.05, 0.3, p), parkR, smooth(0.3, 1, p));
     } else {
       const e = Math.min(1, (ms - TURN - HOLD) / EXIT);
-      const q = easeInOutCubic(e);
+      const q = exitEase(e);
       a = { x: lerp(inPark.x, inGone.x, q), y: lerp(inPark.y, inGone.y, q) };
       b = { x: lerp(outPark.x, outGone.x, q), y: lerp(outPark.y, outGone.y, q) };
-      r = lerp(parkR, endR, smooth(0.05, 1, e));
+      r = lerp(parkR, endR, easeInOutCubic(Math.max(0, q)));
     }
     const d = Math.max(0, r) * 2;
     const vx = a.x - d / 2;
@@ -165,8 +202,30 @@ export function celestialTransition(incoming: CelestialBody, commit: () => void)
       // masks, so they can't drift apart when the page is busy.
       inOrb: { left: `${(a.x - ox).toFixed(1)}px`, top: `${(a.y - half).toFixed(1)}px` },
       outOrb: { left: `${(b.x - ox).toFixed(1)}px`, top: `${(b.y - half).toFixed(1)}px` },
+      inShape: {},
+      outShape: {},
     });
+    pathA.push(a);
+    pathB.push(b);
   }
+
+  // Squash and stretch from the actual motion: each body lengthens along its
+  // velocity, scaled to the fastest moment, so it eases off as it slows,
+  // flips through round as it bounces back, and settles round at rest.
+  const shape = (path: { x: number; y: number }[], key: "inShape" | "outShape") => {
+    const vel = path.map((_, i) => {
+      const q = path[Math.min(path.length - 1, i + 1)];
+      const o = path[Math.max(0, i - 1)];
+      return { x: q.x - o.x, y: q.y - o.y };
+    });
+    const top = Math.max(1e-6, ...vel.map((v) => Math.hypot(v.x, v.y)));
+    vel.forEach((v, i) => {
+      const k = STRETCH * Math.min(1, Math.hypot(v.x, v.y) / top);
+      frames[i][key] = { transform: stretchAlong(Math.atan2(v.y, v.x), k) };
+    });
+  };
+  shape(pathA, "inShape");
+  shape(pathB, "outShape");
 
   const root = document.documentElement;
   const inOrb = buildOrb(incoming, size);
@@ -199,6 +258,10 @@ export function celestialTransition(incoming: CelestialBody, commit: () => void)
       }
       play("inOrb", `::view-transition-group(theme-orb-${incoming})`);
       play("outOrb", `::view-transition-group(theme-orb-${outgoing})`);
+      // The squash and stretch goes on the image, not the group, so it
+      // doesn't fight the group's own positioning transform.
+      play("inShape", `::view-transition-new(theme-orb-${incoming})`);
+      play("outShape", `::view-transition-new(theme-orb-${outgoing})`);
     })
     .catch(cleanup);
   vt.finished.then(cleanup, cleanup);

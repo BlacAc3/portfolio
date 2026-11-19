@@ -384,18 +384,16 @@ const Ducati = ({ fs }: { fs: FrameState }) => {
   return <primitive object={root} />;
 };
 
-/** A sports bike with its rider (rider hides when the bike is parked). */
+/** The sports bike: rides the road, leans, and rests on its stand when parked. */
 export const Bike = ({ fs, pal }: { fs: FrameState; pal: Palette }) => {
   const ref = useRef<THREE.Group>(null);
   const lean = useRef<THREE.Group>(null);
-  const rider = useRef<THREE.Group>(null);
   useFrame(() => {
     const g = ref.current;
     if (!g) return;
     g.visible = fs.bike.visible;
     g.position.set(fs.bike.x, 0, fs.bike.z);
     if (lean.current) lean.current.rotation.x = fs.bike.lean;
-    if (rider.current) rider.current.visible = fs.bike.parked < 0.5;
     // Parked: on its side stand.
     g.rotation.x = fs.bike.parked * 0.18;
   });
@@ -405,27 +403,6 @@ export const Bike = ({ fs, pal }: { fs: FrameState; pal: Palette }) => {
         <Suspense fallback={<ProceduralBike fs={fs} color={pal.bike} />}>
           <Ducati fs={fs} />
         </Suspense>
-        {/* Rider, tucked in behind the screen */}
-        <group ref={rider}>
-          <mesh position={[0.02, 1.13, 0]} rotation-z={-1.2}>
-            <capsuleGeometry args={[0.17, 0.42, 6, 12]} />
-            <meshStandardMaterial color="#1c1a18" roughness={0.7} />
-          </mesh>
-          <mesh position={[0.4, 1.24, 0]}>
-            <sphereGeometry args={[0.15, 20, 16]} />
-            <meshPhysicalMaterial
-              color="#f4ede3"
-              clearcoat={1}
-              roughness={0.2}
-            />
-          </mesh>
-          {[-1, 1].map((s) => (
-            <mesh key={s} position={[-0.22, 0.82, s * 0.2]} rotation-z={0.75}>
-              <capsuleGeometry args={[0.07, 0.42, 4, 8]} />
-              <meshStandardMaterial color="#1c1a18" roughness={0.7} />
-            </mesh>
-          ))}
-        </group>
       </group>
     </group>
   );
