@@ -55,8 +55,8 @@ const zebraMat = (plain = false) =>
     transparent: true,
     depthWrite: false,
     polygonOffset: true,
-    polygonOffsetFactor: -1,
-    polygonOffsetUnits: -1,
+    polygonOffsetFactor: -2,
+    polygonOffsetUnits: -8,
     uniforms: { uOpacity: { value: 0 }, uDark: { value: new THREE.Color("#120e0b") }, uLight: { value: new THREE.Color("#f4ede3") } },
     vertexShader: /* glsl */ `
       varying vec3 vN;
@@ -526,6 +526,11 @@ function rig812(scene: THREE.Object3D) {
     roughness: 0.28,
     clearcoat: 1,
     clearcoatRoughness: 0.05,
+    // The file's black inner shell sits a hair under the panels; nudge the
+    // paint toward the camera in depth so the two never fight (flicker).
+    polygonOffset: true,
+    polygonOffsetFactor: -1,
+    polygonOffsetUnits: -4,
   });
   const zebra = zebraMat(true);
   const tail = new THREE.MeshStandardMaterial({ color: "#5a0808", emissive: "#ff1a1a", emissiveIntensity: 1 });

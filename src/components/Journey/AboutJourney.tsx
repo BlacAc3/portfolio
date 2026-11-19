@@ -6,7 +6,7 @@ import { useTheme } from "../../contexts/ThemeContext";
 import { hasWebGL, useMediaQuery, usePrefersReducedMotion } from "../../hooks/useMediaQuery";
 import { jumpTo } from "../../lib/jump";
 import { CHAPTERS, ROSSO } from "./chapters";
-import { N, READ_AT, veilAt } from "./timeline";
+import { N, STARTS, STOPS, chapterAt, readU, spanOf, veilAt } from "./timeline";
 import { pauseParticles } from "../magicui/particles";
 import JourneyStatic from "./JourneyStatic";
 import { journey, window4 } from "./state";
@@ -118,7 +118,7 @@ const Panel = ({ i }: { i: number }) => {
     >
       <p className="font-tech text-xs font-bold text-ink/55">
         <span className="text-accent">
-          {i + 1}/{N}
+          {i + 1}/{STOPS}
         </span>{" "}
         {c.stop}
       </p>
@@ -137,7 +137,7 @@ const Panel = ({ i }: { i: number }) => {
         ))}
       </ul>
       {c.note && <p className="mt-4 hidden max-w-[30rem] text-xs leading-relaxed text-ink/50 md:block">{c.note}</p>}
-      {i === N - 1 && (
+      {i === STOPS - 1 && (
         <div data-outro className="mt-6 flex flex-wrap gap-3" style={{ opacity: 0 }}>
           <Link
             to="/work"
@@ -168,7 +168,7 @@ const Drive = () => {
   const go = (c: number) => {
     const st = trigger.current;
     if (!st) return;
-    jumpTo(st.start + ((c + READ_AT[c]) / N) * (st.end - st.start));
+    jumpTo(st.start + (readU(c) / N) * (st.end - st.start));
   };
 
   // Mount the scene a screen early; only render frames while on screen.
@@ -204,13 +204,15 @@ const Drive = () => {
     const apply = (u: number) => {
       journey.u = u;
       panels.forEach((p, i) => {
-        const v = u - i;
+        const v = u - STARTS[i];
+        const span = spanOf(i);
+        const last = i === STOPS - 1;
         const a = i === 0 ? -1 : -0.02;
-        const d = i === N - 1 ? 2 : 0.98;
-        const o = window4(v, a, i === 0 ? -0.5 : 0.1, i === N - 1 ? 1.5 : 0.86, d);
+        const d = last ? span + 1 : span - 0.02;
+        const o = window4(v, a, i === 0 ? -0.5 : 0.1, last ? span + 0.5 : span - 0.14, d);
         p.style.opacity = String(o);
         p.style.visibility = o > 0.01 ? "visible" : "hidden";
-        const y = (1 - o) * (v < 0.5 ? 18 : -18);
+        const y = (1 - o) * (v < span / 2 ? 18 : -18);
         p.style.transform = `translate3d(0, calc(${y}px + var(--panel-y, 0px)), 0)`;
       });
       if (outro) outro.style.opacity = String(window4(u - (N - 1), 0.84, 0.92, 2, 3));
@@ -218,14 +220,14 @@ const Drive = () => {
       if (fill) fill.style.transform = `scaleX(${k})`;
       if (marker) marker.style.left = `${k * 100}%`;
       if (veil) veil.style.opacity = String(veilAt(u));
-      const c = Math.min(N - 1, Math.floor(u));
+      const c = chapterAt(u);
       if (c !== current) {
         current = c;
         stops.forEach((b, i) => {
           if (i === c) b.setAttribute("aria-current", "step");
           else b.removeAttribute("aria-current");
         });
-        if (pillNum) pillNum.textContent = `${c + 1}/${N}`;
+        if (pillNum) pillNum.textContent = `${c + 1}/${STOPS}`;
         if (pillLabel) pillLabel.textContent = CHAPTERS[c].stop;
       }
     };
@@ -275,7 +277,7 @@ const Drive = () => {
   }, []);
 
   const step = (d: number) => {
-    const c = Math.min(N - 1, Math.max(0, Math.floor(journey.u) + d));
+    const c = Math.min(STOPS - 1, Math.max(0, chapterAt(journey.u) + d));
     go(c);
   };
 
@@ -284,7 +286,7 @@ const Drive = () => {
       <section
         ref={section}
         id="journey"
-        aria-label="The drive: what I love, in nine stops"
+        aria-label="The drive: what I love, in eight stops"
         className="relative"
         style={{ height: `calc(${N * PER_CHAPTER * 100}svh + 100svh)` }}
       >
@@ -346,7 +348,7 @@ const Drive = () => {
               />
               <ol className="m-0 list-none p-0">
                 {CHAPTERS.map((c, i) => (
-                  <li key={c.id} className="absolute top-0 -translate-x-1/2" style={{ left: `${((i + READ_AT[i]) / N) * 100}%` }}>
+                  <li key={c.id} className="absolute top-0 -translate-x-1/2" style={{ left: `${(readU(i) / N) * 100}%` }}>
                     <button
                       type="button"
                       data-stop={i}
@@ -387,7 +389,7 @@ const Drive = () => {
                 className="min-w-[10.5rem] rounded-full px-3 py-2 text-center text-sm font-semibold text-ink"
               >
                 <span data-pill-num className="mr-2 font-tech text-xs text-accent">
-                  1/{N}
+                  1/{STOPS}
                 </span>
                 <span data-pill-label>{CHAPTERS[0].stop}</span>
               </button>

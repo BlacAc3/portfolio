@@ -240,7 +240,7 @@ export default function JourneyScene({
     <Canvas
       frameloop={active ? "always" : "never"}
       dpr={[1, maxDpr]}
-      camera={{ fov: 40, near: 0.05, far: 400, position: [6, 1.2, 5] }}
+      camera={{ fov: 40, near: 0.2, far: 400, position: [6, 1.2, 5] }}
       gl={{ antialias: true, powerPreference: "high-performance" }}
       aria-hidden="true"
     >

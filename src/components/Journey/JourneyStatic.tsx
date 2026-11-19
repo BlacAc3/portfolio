@@ -9,7 +9,7 @@ export default function JourneyStatic() {
     <section id="journey" aria-labelledby="journey-title" className="relative px-6 py-20 md:py-28">
       <div className="mx-auto max-w-4xl">
         <h2 id="journey-title" className="font-display text-[clamp(2rem,4.4vw,3.5rem)] font-black tracking-[-0.035em] text-ink">
-          What I love, in nine stops
+          What I love, in eight stops
         </h2>
         <p className="mt-3 max-w-xl text-ink/65">
           The animated drive is off because your device asks for reduced motion, or can&apos;t run 3D. Here&apos;s the same route.

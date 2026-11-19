@@ -433,6 +433,25 @@ const GloveModel = () => {
 
 useGLTF.preload(GLOVE_MODEL, false);
 
+/** The guard: fists up near the camera (which rests at z = 3.7, eye height 2.5). */
+const GUARD = { x: 0.24, y: 2.36, z: 2.55 };
+
+/**
+ * Glove orientations for each hand (index 0 = left). At rest the glove has its
+ * knuckles toward the bag (-z) and the palm down: that is the landing pose.
+ *   guard  knuckles up, palm facing the other hand, canted in a touch
+ *   hook   knuckles turned in toward the centre, palm toward you
+ */
+const POSE = (() => {
+  const q = (x: number, y: number, z: number) => new THREE.Quaternion().setFromEuler(new THREE.Euler(x, y, z, "YXZ"));
+  const both = (f: (hand: Hand) => THREE.Quaternion) => [f(-1), f(1)];
+  return {
+    guard: both((h) => q(Math.PI * 0.44, h * 0.18, -h * Math.PI * 0.5)),
+    punch: both((h) => q(0, 0, h * 0.08)),
+    hook: both((h) => q(0.1, h * Math.PI * 0.36, -h * Math.PI * 0.5)),
+  };
+})();
+
 export const Boxing = ({ fs, pal }: { fs: FrameState; pal: Palette }) => {
   const glove = useMemo(
     () => new THREE.MeshPhysicalMaterial({ color: ROSSO, roughness: 0.35, clearcoat: 0.8, clearcoatRoughness: 0.2 }),
@@ -455,31 +474,39 @@ export const Boxing = ({ fs, pal }: { fs: FrameState; pal: Palette }) => {
       bag.current.rotation.set(s.x, 0, s.z);
     }
     for (const m of [bagMat.current, bandMat.current]) if (m) m.opacity = solid;
-    // Gloves: guard position, then punches.
+    // Gloves: up into a guard close to the camera, then punches that twist
+    // from the guard (knuckles up) to the landing pose and back.
     const show = smooth(seg(t, 0.28, 0.36));
     ([-1, 1] as Hand[]).forEach((hand, i) => {
       const g = hands.current[i];
       if (!g) return;
       g.visible = show > 0.01;
-      const guard = new THREE.Vector3(hand * 0.42, 2.12 - (1 - show) * 0.8, 2.35);
+      const bob = Math.sin(t * 60 + i * 1.7) * 0.012;
+      const guard = new THREE.Vector3(hand * GUARD.x, GUARD.y - (1 - show) * 0.7 + bob, GUARD.z);
       const p = guard.clone();
-      let roll = 0;
+      const q = POSE.guard[i].clone();
       for (const c of COMBO) {
         if (c.hand !== hand) continue;
         const e = extension(t, c);
         if (!e) continue;
+        // The fist turns over a little ahead of the reach, so it lands turned.
+        const turn = Math.min(1, e * 1.25);
         if (c.kind === "hook") {
-          // Arc in from the side.
+          // Elbow up, arcing in from the side, palm toward you.
           const a = e * Math.PI * 0.5;
-          p.set(hand * (0.36 + Math.sin(a) * 0.35 - e * 0.55), 2.15 + e * 0.3, 2.45 - Math.sin(a) * 1.75);
-          roll = hand * e * 1.2;
+          p.set(
+            hand * (GUARD.x + Math.sin(a) * 0.42 - e * 0.64),
+            guard.y + e * 0.18,
+            guard.z - Math.sin(a) * (guard.z - BAG.r - 0.2),
+          );
+          q.slerpQuaternions(POSE.guard[i], POSE.hook[i], turn);
         } else {
-          p.lerp(new THREE.Vector3(hand * 0.08, 2.48, BAG.r + 0.12), e);
-          roll = hand * e * 0.25;
+          p.lerp(new THREE.Vector3(hand * 0.09, 2.44, BAG.r + 0.14), e);
+          q.slerpQuaternions(POSE.guard[i], POSE.punch[i], turn);
         }
       }
       g.position.copy(p);
-      g.rotation.set(0, 0, roll);
+      g.quaternion.copy(q);
     });
   });
 
