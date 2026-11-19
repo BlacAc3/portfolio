@@ -7,6 +7,8 @@ import {
   type MotionValue,
 } from "framer-motion";
 import AboutSection from "../components/About/AboutSection";
+import AboutJourney, { openShortVersion } from "../components/Journey/AboutJourney";
+import { jumpTo } from "../lib/jump";
 import me from "../assets/me.webp";
 
 const ease = [0.22, 1, 0.36, 1] as const;
@@ -139,13 +141,35 @@ const About = () => {
           </h1>
           <p className="max-w-xl text-lg md:text-2xl text-ink/70 leading-relaxed">
             Full-stack engineer with a designer&apos;s eye — building platforms
-            that are fast under load and calm to use.
+            that are fast under load and calm to use. Off the keyboard: V12s,
+            Arch Linux, French and boxing.
           </p>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <button
+              type="button"
+              onClick={() => {
+                const el = document.getElementById("journey");
+                if (el) jumpTo(el.getBoundingClientRect().top + window.scrollY);
+              }}
+              className="rounded-full bg-accent px-6 py-3 text-sm font-bold text-canvas hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            >
+              Take the drive
+            </button>
+            <button
+              type="button"
+              onClick={openShortVersion}
+              className="rounded-full border border-ink/20 px-6 py-3 text-sm font-semibold text-ink hover:border-accent hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            >
+              The short version
+            </button>
+          </div>
         </motion.div>
         <div className="md:col-span-5">
           <Portrait />
         </div>
       </header>
+
+      <AboutJourney />
 
       <AboutSection />
 

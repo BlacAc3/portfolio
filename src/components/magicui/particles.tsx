@@ -1,32 +1,4 @@
-"use client";
-
-import React, { useEffect, useRef, useState } from "react";
-
-interface MousePosition {
-  x: number;
-  y: number;
-}
-
-function useMousePosition(): MousePosition {
-  const [mousePosition, setMousePosition] = useState<MousePosition>({
-    x: 0,
-    y: 0,
-  });
-
-  useEffect(() => {
-    const handleMouseMove = (event: MouseEvent) => {
-      setMousePosition({ x: event.clientX, y: event.clientY });
-    };
-
-    window.addEventListener("mousemove", handleMouseMove);
-
-    return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
-    };
-  }, []);
-
-  return mousePosition;
-}
+import React, { useEffect, useRef } from "react";
 
 interface ParticlesProps {
   className?: string;
@@ -34,246 +6,207 @@ interface ParticlesProps {
   staticity?: number;
   ease?: number;
   size?: number;
+  /** Kept for API compatibility; the field re-seeds on resize and colour change. */
   refresh?: boolean;
   color?: string;
   vx?: number;
   vy?: number;
 }
 
+type Circle = {
+  x: number;
+  y: number;
+  tx: number;
+  ty: number;
+  size: number;
+  alpha: number;
+  targetAlpha: number;
+  dx: number;
+  dy: number;
+  magnetism: number;
+};
+
+/**
+ * Pause every particle field while something opaque covers the viewport
+ * (the About page's 3D drive). Counted, so overlapping callers compose.
+ */
+let pauses = 0;
+const wakers = new Set<() => void>();
+export const pauseParticles = () => {
+  pauses++;
+  return () => {
+    pauses = Math.max(0, pauses - 1);
+    if (!pauses) wakers.forEach((w) => w());
+  };
+};
+
+const hexToRgb = (hex: string) => {
+  const h = hex.replace("#", "");
+  return [0, 2, 4].map((i) => parseInt(h.substring(i, i + 2), 16)).join(", ");
+};
+
+/**
+ * Drifting dots that lean toward the pointer. One rAF loop per field,
+ * cancelled on unmount; pointer tracking lives in a ref (no re-renders);
+ * the loop sleeps while the field is off screen, the tab is hidden, or a
+ * caller has paused it, and draws one still frame under reduced motion.
+ */
 const Particles: React.FC<ParticlesProps> = ({
   className = "",
   quantity = 100,
   staticity = 50,
   ease = 50,
   size = 0.4,
-  refresh = false,
   color = "#ffffff",
   vx = 0,
   vy = 0,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const canvasContainerRef = useRef<HTMLDivElement>(null);
-  const context = useRef<CanvasRenderingContext2D | null>(null);
-  const circles = useRef<any[]>([]);
-  const mousePosition = useMousePosition();
-  const mouse = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
-  const canvasSize = useRef<{ w: number; h: number }>({ w: 0, h: 0 });
-  const dpr = typeof window !== "undefined" ? window.devicePixelRatio : 1;
+  const boxRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (canvasRef.current) {
-      context.current = canvasRef.current.getContext("2d");
-    }
-    initCanvas();
-    animate();
-    window.addEventListener("resize", initCanvas);
+    const canvas = canvasRef.current;
+    const box = boxRef.current;
+    const ctx = canvas?.getContext("2d");
+    if (!canvas || !box || !ctx) return;
 
-    return () => {
-      window.removeEventListener("resize", initCanvas);
+    const reduced = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    const rgb = hexToRgb(color);
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    let w = 0;
+    let h = 0;
+    let left = 0;
+    let top = 0;
+    const mouse = { x: 0, y: 0 };
+    let circles: Circle[] = [];
+
+    const spawn = (): Circle => ({
+      x: Math.random() * w,
+      y: Math.random() * h,
+      tx: 0,
+      ty: 0,
+      size: Math.floor(Math.random() * 2) + size,
+      alpha: 0,
+      targetAlpha: Math.round((Math.random() * 0.6 + 0.1) * 10) / 10,
+      dx: (Math.random() - 0.5) * 0.1 + vx,
+      dy: (Math.random() - 0.5) * 0.1 + vy,
+      magnetism: 0.1 + Math.random() * 4,
+    });
+
+    const measure = () => {
+      const r = box.getBoundingClientRect();
+      left = r.left;
+      top = r.top;
     };
-  }, [color]);
-
-  useEffect(() => {
-    onMouseMove();
-  }, [mousePosition.x, mousePosition.y]);
-
-  useEffect(() => {
-    initCanvas();
-  }, [refresh]);
-
-  const initCanvas = () => {
-    resizeCanvas();
-    drawParticles();
-  };
-
-  const onMouseMove = () => {
-    if (canvasRef.current) {
-      const rect = canvasRef.current.getBoundingClientRect();
-      const { w, h } = canvasSize.current;
-      const x = mousePosition.x - rect.left;
-      const y = mousePosition.y - rect.top;
-      const inside = x < w && x > 0 && y < h && y > 0;
-      if (inside) {
-        mouse.current.x = x;
-        mouse.current.y = y;
-      }
-    }
-  };
-
-  type Circle = {
-    x: number;
-    y: number;
-    translateX: number;
-    translateY: number;
-    size: number;
-    alpha: number;
-    targetAlpha: number;
-    dx: number;
-    dy: number;
-    magnetism: number;
-  };
-
-  const resizeCanvas = () => {
-    if (canvasContainerRef.current && canvasRef.current && context.current) {
-      circles.current = [];
-      canvasSize.current.w = canvasContainerRef.current.offsetWidth;
-      canvasSize.current.h = canvasContainerRef.current.offsetHeight;
-      canvasRef.current.width = canvasSize.current.w * dpr;
-      canvasRef.current.height = canvasSize.current.h * dpr;
-      canvasRef.current.style.width = `${canvasSize.current.w}px`;
-      canvasRef.current.style.height = `${canvasSize.current.h}px`;
-      context.current.scale(dpr, dpr);
-    }
-  };
-
-  const circleParams = (): Circle => {
-    const x = Math.floor(Math.random() * canvasSize.current.w);
-    const y = Math.floor(Math.random() * canvasSize.current.h);
-    const translateX = 0;
-    const translateY = 0;
-    const pSize = Math.floor(Math.random() * 2) + size;
-    const alpha = 0;
-    const targetAlpha = parseFloat((Math.random() * 0.6 + 0.1).toFixed(1));
-    const dx = (Math.random() - 0.5) * 0.1 + vx;
-    const dy = (Math.random() - 0.5) * 0.1 + vy;
-    const magnetism = 0.1 + Math.random() * 4;
-    return {
-      x,
-      y,
-      translateX,
-      translateY,
-      size: pSize,
-      alpha,
-      targetAlpha,
-      dx,
-      dy,
-      magnetism,
+    const resize = () => {
+      w = box.offsetWidth;
+      h = box.offsetHeight;
+      canvas.width = Math.round(w * dpr);
+      canvas.height = Math.round(h * dpr);
+      canvas.style.width = `${w}px`;
+      canvas.style.height = `${h}px`;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      measure();
+      circles = Array.from({ length: quantity }, spawn);
     };
-  };
 
-  const drawCircle = (circle: Circle, update = false) => {
-    if (context.current) {
-      const { x, y, translateX, translateY, size, alpha } = circle;
-      context.current.translate(translateX, translateY);
-      context.current.beginPath();
-      context.current.arc(x, y, size, 0, 2 * Math.PI);
-      context.current.fillStyle = hexToRgb(color, alpha);
-      context.current.fill();
-      context.current.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-      if (!update) {
-        circles.current.push(circle);
+    const draw = (step: boolean) => {
+      ctx.clearRect(0, 0, w, h);
+      ctx.fillStyle = `rgb(${rgb})`;
+      for (let i = 0; i < circles.length; i++) {
+        const c = circles[i];
+        if (step) {
+          const edge = Math.min(
+            c.x + c.tx - c.size,
+            w - c.x - c.tx - c.size,
+            c.y + c.ty - c.size,
+            h - c.y - c.ty - c.size,
+          );
+          const near = Math.max(0, edge / 20);
+          if (near > 1) c.alpha = Math.min(c.targetAlpha, c.alpha + 0.02);
+          else c.alpha = c.targetAlpha * near;
+          c.x += c.dx;
+          c.y += c.dy;
+          c.tx += (mouse.x / (staticity / c.magnetism) - c.tx) / ease;
+          c.ty += (mouse.y / (staticity / c.magnetism) - c.ty) / ease;
+          if (
+            c.x < -c.size ||
+            c.x > w + c.size ||
+            c.y < -c.size ||
+            c.y > h + c.size
+          ) {
+            circles[i] = spawn();
+            continue;
+          }
+        } else c.alpha = c.targetAlpha;
+        ctx.globalAlpha = c.alpha;
+        ctx.beginPath();
+        ctx.arc(c.x + c.tx, c.y + c.ty, c.size, 0, Math.PI * 2);
+        ctx.fill();
       }
-    }
-  };
+      ctx.globalAlpha = 1;
+    };
 
-  const hexToRgb = (hex: string, alpha: number): string => {
-    hex = hex.replace("#", "");
-    const r = parseInt(hex.substring(0, 2), 16);
-    const g = parseInt(hex.substring(2, 4), 16);
-    const b = parseInt(hex.substring(4, 6), 16);
-    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-  };
+    let raf = 0;
+    let onScreen = true;
+    const running = () => onScreen && !pauses && !document.hidden && !reduced;
+    const frame = () => {
+      raf = 0;
+      if (!running()) return;
+      draw(true);
+      raf = requestAnimationFrame(frame);
+    };
+    const wake = () => {
+      if (!raf && running()) raf = requestAnimationFrame(frame);
+    };
 
-  const drawParticles = () => {
-    for (let i = 0; i < quantity; i++) {
-      const circle = circleParams();
-      drawCircle(circle);
-    }
-  };
-
-  const remapValue = (
-    value: number,
-    start1: number,
-    end1: number,
-    start2: number,
-    end2: number,
-  ): number => {
-    const remapped =
-      ((value - start1) * (end2 - start2)) / (end1 - start1) + start2;
-    return remapped > 0 ? remapped : 0;
-  };
-
-  const animate = () => {
-    clearContext();
-    circles.current.forEach((circle: Circle, i: number) => {
-      // Handle the alpha animation
-      const edge = [
-        circle.x + circle.translateX - circle.size, // left
-        canvasSize.current.w - circle.x - circle.translateX - circle.size, // right
-        circle.y + circle.translateY - circle.size, // top
-        canvasSize.current.h - circle.y - circle.translateY - circle.size, // bottom
-      ];
-      const closestEdge = edge.reduce((a, b) => Math.min(a, b));
-      const remapClosestEdge = parseFloat(
-        remapValue(closestEdge, 0, 20, 0, 1).toFixed(2),
-      );
-      if (remapClosestEdge > 1) {
-        circle.alpha += 0.02;
-        if (circle.alpha > circle.targetAlpha) {
-          circle.alpha = circle.targetAlpha;
-        }
-      } else {
-        circle.alpha = circle.targetAlpha * remapClosestEdge;
+    const onMove = (e: PointerEvent) => {
+      const x = e.clientX - left;
+      const y = e.clientY - top;
+      if (x > 0 && x < w && y > 0 && y < h) {
+        mouse.x = x;
+        mouse.y = y;
       }
+    };
+    const onResize = () => {
+      resize();
+      if (reduced) draw(false);
+    };
 
-      circle.x += circle.dx;
-      circle.y += circle.dy;
-      circle.translateX +=
-        (mouse.current.x / (staticity / circle.magnetism) - circle.translateX) /
-        ease;
-      circle.translateY +=
-        (mouse.current.y / (staticity / circle.magnetism) - circle.translateY) /
-        ease;
+    resize();
+    if (reduced) draw(false);
+    else wake();
 
-      // circle within bounds
-      if (
-        circle.x < -circle.size ||
-        circle.x > canvasSize.current.w + circle.size ||
-        circle.y < -circle.size ||
-        circle.y > canvasSize.current.h + circle.size
-      ) {
-        // remove the circle from the array
-        circles.current.splice(i, 1);
-        // add a new circle
-        const newCircle = circleParams();
-        drawCircle(newCircle);
-        // update the alpha to 0
-        newCircle.alpha = 0;
-      } else {
-        drawCircle(
-          {
-            ...circle,
-            x: circle.x,
-            y: circle.y,
-            translateX: circle.translateX,
-            translateY: circle.translateY,
-            alpha: circle.alpha,
-          },
-          true,
-        );
+    const io = new IntersectionObserver(([e]) => {
+      onScreen = e.isIntersecting;
+      if (onScreen) {
+        measure();
+        wake();
       }
     });
-    window.requestAnimationFrame(animate);
-  };
+    io.observe(box);
+    const ro = new ResizeObserver(onResize);
+    ro.observe(box);
+    wakers.add(wake);
+    window.addEventListener("pointermove", onMove, { passive: true });
+    window.addEventListener("scroll", measure, { passive: true });
+    document.addEventListener("visibilitychange", wake);
 
-  const clearContext = () => {
-    if (context.current) {
-      context.current.clearRect(
-        0,
-        0,
-        canvasSize.current.w,
-        canvasSize.current.h,
-      );
-    }
-  };
+    return () => {
+      cancelAnimationFrame(raf);
+      io.disconnect();
+      ro.disconnect();
+      wakers.delete(wake);
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("scroll", measure);
+      document.removeEventListener("visibilitychange", wake);
+    };
+  }, [color, quantity, staticity, ease, size, vx, vy]);
 
   return (
-    <div
-      className={className}
-      ref={canvasContainerRef}
-      aria-hidden="true"
-    >
+    <div className={className} ref={boxRef} aria-hidden="true">
       <canvas ref={canvasRef} />
     </div>
   );

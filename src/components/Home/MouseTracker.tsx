@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, useMotionValue, useSpring } from "framer-motion";
 import { useMediaQuery, usePrefersReducedMotion } from "../../hooks/useMediaQuery";
 
@@ -70,20 +70,54 @@ const MouseTracker = () => {
   const [hovering, setHovering] = useState(false);
   const [visible, setVisible] = useState(false);
   const [tone, setTone] = useState<Tone>("dark");
+  const layer = useRef<HTMLDivElement>(null);
+
+  // Modal dialogs live in the browser's top layer, above any z-index. Keep
+  // the cursor there too, and re-raise it whenever a dialog opens so it
+  // paints above that dialog.
+  useEffect(() => {
+    const el = layer.current;
+    if (!enabled || !el || typeof el.showPopover !== "function") return;
+    const raise = () => {
+      if (el.matches(":popover-open")) el.hidePopover();
+      el.showPopover();
+    };
+    raise();
+    const mo = new MutationObserver((records) => {
+      if (records.some((r) => (r.target as Element).matches("dialog[open]"))) raise();
+    });
+    mo.observe(document.body, { subtree: true, attributes: true, attributeFilter: ["open"] });
+    const onToggle = (e: Event) => {
+      if (e.target !== el && (e as ToggleEvent).newState === "open") raise();
+    };
+    document.addEventListener("toggle", onToggle, true);
+    return () => {
+      mo.disconnect();
+      document.removeEventListener("toggle", onToggle, true);
+      if (el.matches(":popover-open")) el.hidePopover();
+    };
+  }, [enabled]);
 
   useEffect(() => {
     if (!enabled) return;
     const root = document.documentElement;
     root.classList.add("has-custom-cursor");
 
-    // Sample the background at most once a frame — on move, and on scroll,
-    // since content slides under a resting pointer.
+    // Sample the background on move and on scroll (content slides under a
+    // resting pointer), but at most every 120 ms: each sample reads computed
+    // styles, which forces a style recalc mid-scroll.
     let px = -1;
     let py = -1;
     let raf = 0;
-    const sample = () => {
+    let last = 0;
+    const sample = (now: number) => {
       raf = 0;
       if (px < 0) return;
+      if (now - last < 120) {
+        raf = requestAnimationFrame(sample);
+        return;
+      }
+      last = now;
       setTone(toneAt(px, py));
     };
     const queue = () => {
@@ -118,7 +152,12 @@ const MouseTracker = () => {
   const c = TONES[tone];
 
   return (
-    <>
+    <div
+      ref={layer}
+      popover="manual"
+      aria-hidden="true"
+      className="pointer-events-none fixed inset-0 m-0 h-full w-full overflow-visible border-0 bg-transparent p-0"
+    >
       <motion.div
         aria-hidden="true"
         className="fixed top-0 left-0 z-[9999] pointer-events-none rounded-full -translate-x-1/2 -translate-y-1/2 border"
@@ -141,7 +180,7 @@ const MouseTracker = () => {
         animate={{ backgroundColor: c.dot }}
         transition={{ duration: 0.2 }}
       />
-    </>
+    </div>
   );
 };
 
